@@ -1185,7 +1185,7 @@
 }
 
 .memoir-viewer__nav--next {
-  right: calc(var(--spacing-lg) + 60px); /* 给右侧进度指示器留空间 */
+  right: calc(var(--spacing-lg) + 20px);
 }
 
 /* ========================================
