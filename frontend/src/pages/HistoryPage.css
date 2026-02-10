@@ -1,0 +1,1193 @@
+/* ========================================
+   HistoryPage - 水平画廊 (Horizontal Gallery)
+   Kinari 生成色背景 + 纸张纹理
+   左上方暖光照射，营造场域感
+   ======================================== */
+
+.history-page {
+  height: 100vh;
+  overflow: hidden; /* 禁止页面整体滚动 */
+  /* 背景渐变：下半部分稍亮，暗示台面存在 */
+  background: 
+    /* 左上方暖光 */
+    radial-gradient(
+      ellipse 80% 60% at 15% 20%,
+      rgba(255, 248, 235, 0.5) 0%,
+      transparent 50%
+    ),
+    /* 下方台面区域微亮 */
+    linear-gradient(
+      to bottom,
+      #F3F2EF 0%,
+      #F5F5F3 40%,
+      #FAF9F7 75%,
+      #FDFCFA 100%
+    );
+  /* 纸张纹理叠加 */
+  background-color: #F5F5F3;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xl) var(--spacing-xl) 0;
+  position: relative;
+  /* 防止触摸设备上的弹性滚动 */
+  overscroll-behavior: none;
+}
+
+/* 纸张纹理层 */
+.history-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 背景装饰文字 - 右下角 MEMOIRS */
+.history-page::after {
+  content: 'MEMOIRS';
+  position: absolute;
+  right: -20px;
+  bottom: 5%;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: clamp(120px, 18vw, 280px);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  color: rgba(60, 50, 40, 0.035);
+  pointer-events: none;
+  z-index: 0;
+  line-height: 1;
+  /* 轻微倾斜增加动感 */
+  transform: rotate(-5deg);
+}
+
+/* 确保内容在纹理层之上 */
+.history-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ========================================
+   Control Deck - 左上角控制区
+   ======================================== */
+.history-control-deck {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1; /* 低于书本悬停时的层级 */
+}
+
+.history-control-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* 返回链接 */
+.history-back-link {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+  text-decoration: none;
+}
+
+.history-back-link:hover {
+  color: var(--color-primary);
+}
+
+/* 标题区域 */
+.history-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* 标题 - 大号衬线体 */
+.history-title {
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #2C2C2C;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+/* 红色"藏"印章 */
+.history-stamp {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Noto Serif SC', 'SimSun', serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #C53D43;
+  border: 2px solid #C53D43;
+  border-radius: 4px;
+  transform: rotate(-8deg);
+  opacity: 0.85;
+  /* 印章质感 */
+  background: rgba(255, 250, 248, 0.3);
+  box-shadow: 
+    inset 0 0 0 1px rgba(197, 61, 67, 0.2),
+    1px 1px 2px rgba(197, 61, 67, 0.1);
+}
+
+/* 筛选器 - 文字标签 */
+.history-filters {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+}
+
+.filter-label {
+  position: relative;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color var(--transition-fast);
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+
+.filter-label:hover {
+  color: var(--color-text);
+}
+
+.filter-label.active {
+  color: #2C2C2C;
+  font-weight: 600;
+}
+
+/* 选中项底部绿色下划线 - 笔触感 */
+.filter-label.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  /* 笔触感渐变，不是死板直线 */
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-primary) 8%,
+    var(--color-primary) 45%,
+    rgba(93, 138, 102, 0.7) 75%,
+    rgba(93, 138, 102, 0.3) 92%,
+    transparent 100%
+  );
+  border-radius: 1px;
+  /* 轻微的粗细变化 */
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 3' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,1.5 Q10,0.5 25,1.8 T50,1.2 T75,1.6 T100,1.5' stroke='black' stroke-width='3' fill='none'/%3E%3C/svg%3E");
+  mask-size: 100% 100%;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 3' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,1.5 Q10,0.5 25,1.8 T50,1.2 T75,1.6 T100,1.5' stroke='black' stroke-width='3' fill='none'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+}
+
+/* 筛选计数 - 小而淡 */
+.filter-count {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-left: 4px;
+  font-weight: 400;
+}
+
+.filter-label.active .filter-count {
+  color: var(--color-primary);
+}
+
+/* 右上角极简图标 */
+.history-control-right {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.control-icon-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+}
+
+.control-icon-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: var(--color-text);
+}
+
+.control-icon-btn.active {
+  background-color: var(--color-bg-active);
+  color: var(--color-primary);
+}
+
+/* 图标悬停时显示文字提示 */
+.control-icon-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 6px;
+  padding: 4px 8px;
+  background-color: #2C2C2C;
+  color: white;
+  font-size: 0.7rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-fast);
+  pointer-events: none;
+}
+
+.control-icon-btn:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 批量选择模式下的操作栏 */
+.history-select-bar {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  padding: 6px 12px;
+  background-color: rgba(93, 138, 102, 0.08);
+  border-radius: var(--radius-md);
+}
+
+.select-bar-text {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-right: var(--spacing-xs);
+}
+
+.select-bar-btn {
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.select-bar-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: var(--color-text);
+}
+
+.select-bar-btn.danger {
+  color: var(--color-error);
+}
+
+.select-bar-btn.danger:hover {
+  background-color: var(--color-error-light);
+}
+
+.select-bar-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Error Toast */
+.history-error-toast {
+  position: fixed;
+  top: var(--spacing-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-error-light);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
+  color: var(--color-error);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.history-error-toast button {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: var(--color-error);
+  line-height: 1;
+}
+
+/* Content - 水平画廊容器 */
+.history-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: visible;
+  position: relative;
+}
+
+/* Bookshelf - 水平画廊布局 */
+.bookshelf {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding-bottom: 60px;
+  padding-top: 30px;
+  overflow: visible;
+}
+
+.bookshelf-row {
+  display: flex;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-2xl) 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  align-items: flex-end;
+  min-height: 100%;
+  -webkit-overflow-scrolling: touch;
+  flex-wrap: nowrap;
+  /* 硬件加速 */
+  will-change: scroll-position;
+  transform: translateZ(0);
+}
+
+/* 添加右侧空白区域，确保可以滚动 */
+.bookshelf-row::after {
+  content: '';
+  flex-shrink: 0;
+  width: 200px; /* 右侧留白 */
+}
+
+.bookshelf-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* 轻量化书架线 - Hinoki 扁柏色浅木纹板 */
+.bookshelf-wood {
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  /* 浅色木纹效果 */
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #E8DFD4 5%,
+    #F0E8DD 20%,
+    #E5DCD0 40%,
+    #EDE5DA 60%,
+    #E8DFD4 80%,
+    #F0E8DD 95%,
+    transparent 100%
+  );
+  border-radius: 2px;
+  /* 极淡的阴影 */
+  box-shadow: 0 1px 3px rgba(139, 119, 101, 0.1);
+}
+
+/* Diary Book - 实体书效果 */
+.diary-book {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: 
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.35s ease,
+    z-index 0s;
+  position: relative;
+  flex-shrink: 0;
+  /* 左上方光源 → 右下方延伸的柔和漫射投影 */
+  filter: 
+    drop-shadow(8px 12px 16px rgba(60, 50, 40, 0.12))
+    drop-shadow(4px 6px 8px rgba(60, 50, 40, 0.08))
+    drop-shadow(15px 20px 30px rgba(60, 50, 40, 0.06));
+  /* 为倒影留出空间 */
+  padding-bottom: 60px;
+  z-index: 1;
+}
+
+/* 书本倒影 */
+.diary-book::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55px;
+  /* 使用书本封面的模糊倒影效果 */
+  background: linear-gradient(
+    to bottom,
+    rgba(200, 195, 185, 0.25) 0%,
+    rgba(200, 195, 185, 0.12) 30%,
+    rgba(200, 195, 185, 0.05) 60%,
+    transparent 100%
+  );
+  /* 倒影形状 */
+  border-radius: 4px 14px 14px 4px;
+  transform: scaleY(-1) translateY(-5px);
+  transform-origin: bottom center;
+  /* 模糊效果 */
+  filter: blur(3px);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* 抽书效果 - 向上浮起 20px + 投影加重 */
+.diary-book:hover {
+  transform: translateY(-20px);
+  filter: 
+    drop-shadow(12px 18px 24px rgba(60, 50, 40, 0.18))
+    drop-shadow(6px 10px 14px rgba(60, 50, 40, 0.12))
+    drop-shadow(20px 30px 45px rgba(60, 50, 40, 0.1));
+  z-index: 100; /* 悬停时提升到最高层级 */
+}
+
+/* 悬停时倒影变淡 */
+.diary-book:hover::after {
+  opacity: 0.3;
+}
+
+.diary-book.selected {
+  transform: translateY(-20px);
+}
+
+.diary-book.selected .book-cover {
+  box-shadow: 
+    0 0 0 3px var(--color-primary),
+    8px 12px 20px rgba(60, 50, 40, 0.2);
+}
+
+/* 旅行中状态 - 书本微开效果 */
+.diary-book.traveling .book-cover {
+  transform: perspective(800px) rotateY(-8deg);
+  transform-origin: left center;
+}
+
+.diary-book.traveling:hover .book-cover {
+  transform: perspective(800px) rotateY(-5deg) scale(1.05);
+}
+
+.book-checkbox {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 26px;
+  height: 26px;
+  background-color: var(--color-bg-card);
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  z-index: 10;
+  transition: all var(--transition-fast);
+}
+
+.diary-book.selected .book-checkbox {
+  background-color: var(--color-primary);
+}
+
+.book-cover {
+  /* 放大尺寸 - 屏幕高度的 65-70% */
+  width: 220px;
+  height: clamp(280px, 60vh, 380px);
+  border-radius: 4px 14px 14px 4px;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 
+    3px 3px 10px rgba(60, 50, 40, 0.15),
+    inset -2px 0 4px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: 
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.35s ease;
+  background-color: #E8E4DF;
+}
+
+.book-cover:hover {
+  box-shadow: 
+    4px 4px 18px rgba(60, 50, 40, 0.22),
+    inset -2px 0 4px rgba(0, 0, 0, 0.06);
+}
+
+/* 非 traveling 状态的封面放大效果 */
+.diary-book:not(.traveling):hover .book-cover {
+  transform: scale(1.05);
+}
+
+/* 封面图片 */
+.book-cover-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+/* 封面图片悬停放大 */
+.diary-book:hover .book-cover-image {
+  transform: scale(1.08);
+}
+
+/* 亚麻布/和纸纹理叠加 - 让封面像印刷在特种纸上 */
+.book-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='linen'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23linen)' opacity='0.06'/%3E%3C/svg%3E");
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  z-index: 5;
+}
+
+/* 左上方光源的高光反射 */
+.book-cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* 书脊 - 16px 深色条 + 圆脊光泽 + 时间信息 */
+.book-spine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 18px;
+  background: linear-gradient(
+    90deg, 
+    rgba(45, 38, 32, 0.85) 0%,
+    rgba(55, 48, 42, 0.7) 40%,
+    rgba(70, 62, 55, 0.4) 70%,
+    transparent 100%
+  );
+  z-index: 6;
+  /* 书脊上的时间文字布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 书脊圆弧高光 - 模拟装订后的圆脊 */
+.book-spine::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 10%;
+  bottom: 10%;
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.15) 80%,
+    transparent 100%
+  );
+  border-radius: 2px;
+}
+
+/* 书脊上的时间 - 竖排白色细字 */
+.book-spine-date {
+  /* 逆时针旋转90度 */
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  /* 白色细字 */
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 0.55rem;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.75);
+  /* 确保在高光之上 */
+  position: relative;
+  z-index: 1;
+}
+
+/* ========================================
+   腰封 (The Obi) - 日式书籍装帧元素
+   横跨封面的纸质腰带
+   ======================================== */
+.book-obi {
+  position: absolute;
+  bottom: 20%;
+  left: -3px;
+  right: -3px;
+  height: 48px;
+  /* 不透明的纸质背景 */
+  background: linear-gradient(
+    180deg,
+    #FDFCF8 0%,
+    #FAF8F2 40%,
+    #F5F2EB 100%
+  );
+  /* 上下边缘阴影，模拟纸带厚度 */
+  box-shadow: 
+    0 2px 6px rgba(60, 50, 40, 0.15),
+    0 -1px 4px rgba(60, 50, 40, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+  /* 内容布局 */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 6;
+}
+
+/* 腰封左右两端微微翘起的效果 */
+.book-obi::before,
+.book-obi::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  pointer-events: none;
+}
+
+.book-obi::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.04) 0%, transparent 100%);
+}
+
+.book-obi::after {
+  right: 0;
+  background: linear-gradient(-90deg, rgba(0,0,0,0.04) 0%, transparent 100%);
+}
+
+/* 腰封主文字 - 状态或描述 */
+.book-obi-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2A2520;
+  letter-spacing: 0.3em;
+}
+
+/* 旅行中状态 - 腰封上的撰写中标识 */
+.book-obi-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #3A6B42;
+  letter-spacing: 0.3em;
+}
+
+.book-obi-status::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: #5D8A66;
+  border-radius: 50%;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
+
+/* 标题标签 - 日式签条 (Title Strip) */
+.book-title-label {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  /* 竖长条形 - 适应更大的书本 */
+  width: 38px;
+  min-height: 80px;
+  /* 高度自适应内容，不再固定百分比 */
+  height: auto;
+  max-height: 65%;
+  /* 米白色纸条 */
+  background: linear-gradient(
+    180deg,
+    #FFFEF8 0%,
+    #FBF9F2 50%,
+    #F8F6EE 100%
+  );
+  /* 纸张纹理 */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='0.04'/%3E%3C/svg%3E");
+  border-radius: 2px;
+  /* 签条投影 */
+  box-shadow: 
+    -2px 2px 8px rgba(60, 50, 40, 0.15),
+    0 1px 3px rgba(60, 50, 40, 0.08);
+  /* 竖排文字布局 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 5px 10px;
+  z-index: 7;
+}
+
+/* 签条左边缘的微弱阴影，模拟纸片翘起 */
+.book-title-label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 5%;
+  bottom: 5%;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(60, 50, 40, 0.06) 20%,
+    rgba(60, 50, 40, 0.1) 50%,
+    rgba(60, 50, 40, 0.06) 80%,
+    transparent 100%
+  );
+}
+
+/* 城市名 - 竖排宋体 */
+.book-title-label h3 {
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1A1815;
+  margin: 0;
+  /* 竖排文字 */
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  /* 不再使用 flex: 1，让高度自适应文字 */
+}
+
+/* 日期已移至腰封，签条中不再显示 */
+
+/* 撰写中标识已移至腰封，不再需要单独的圆点 */
+
+/* 已完成状态 - 朱砂闲章（方形） */
+.book-stamp-completed {
+  /* 放在签条底部作为落款 */
+  width: 22px;
+  height: 22px;
+  margin-top: auto;
+  /* 方形朱砂印 */
+  border: 1.5px solid #B8423A;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 竖排文字 */
+  writing-mode: vertical-rl;
+  font-family: 'Noto Serif SC', 'SimSun', serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #B8423A;
+  /* 印章质感 - 略微模糊的边缘 */
+  background: rgba(255, 250, 245, 0.3);
+  /* 仿古印效果 */
+  box-shadow: 
+    inset 0 0 0 0.5px rgba(184, 66, 58, 0.4);
+  /* 轻微的不规则感 */
+  transform: rotate(-2deg);
+}
+
+/* 封套效果 - 已完成 */
+.diary-book.completed .book-cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+/* ========================================
+   新建入口 - 空白书 (The Empty Book)
+   温暖奶油色，邀请感设计
+   ======================================== */
+.new-book {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+  /* 右下方延伸投影 */
+  filter: 
+    drop-shadow(6px 10px 12px rgba(60, 50, 40, 0.08))
+    drop-shadow(3px 5px 6px rgba(60, 50, 40, 0.05))
+    drop-shadow(12px 16px 24px rgba(60, 50, 40, 0.04));
+  transition: 
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.35s ease;
+  /* 为倒影留出空间 */
+  padding-bottom: 60px;
+  position: relative;
+}
+
+/* 空白书倒影 */
+.new-book::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55px;
+  background: linear-gradient(
+    to bottom,
+    rgba(220, 215, 205, 0.2) 0%,
+    rgba(220, 215, 205, 0.08) 40%,
+    transparent 100%
+  );
+  border-radius: 4px 14px 14px 4px;
+  transform: scaleY(-1) translateY(-5px);
+  transform-origin: bottom center;
+  filter: blur(3px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.new-book:hover {
+  transform: translateY(-20px);
+  filter: 
+    drop-shadow(10px 16px 20px rgba(60, 50, 40, 0.14))
+    drop-shadow(5px 8px 10px rgba(60, 50, 40, 0.08))
+    drop-shadow(18px 24px 36px rgba(60, 50, 40, 0.08));
+}
+
+.new-book:hover::after {
+  opacity: 0.25;
+}
+
+.new-book-cover {
+  /* 与普通书本相同尺寸 */
+  width: 220px;
+  height: clamp(280px, 60vh, 380px);
+  border-radius: 4px 14px 14px 4px;
+  /* 温暖的奶油色/象牙白 */
+  background: linear-gradient(
+    145deg,
+    #FDF8F0 0%,
+    #FAF5EB 30%,
+    #F7F2E8 70%,
+    #F4EFE5 100%
+  );
+  border: 1px dashed #D8CCBC;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: 
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 纸张纹理 */
+.new-book-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='linen'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23linen)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  z-index: 1;
+}
+
+/* 左上方光源高光 */
+.new-book-cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.15) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  transition: all 0.4s ease;
+  z-index: 2;
+}
+
+/* 悬停时发出微弱暖光 - "来写我吧" */
+.new-book:hover .new-book-cover {
+  transform: scale(1.05);
+  border-color: #C9A86C;
+  background: linear-gradient(
+    145deg,
+    #FFFCF5 0%,
+    #FDF8EE 30%,
+    #FAF5E8 70%,
+    #F7F2E2 100%
+  );
+  box-shadow: 
+    0 0 40px rgba(201, 168, 108, 0.25),
+    0 0 20px rgba(255, 248, 230, 0.4),
+    inset 0 0 30px rgba(255, 250, 240, 0.3);
+}
+
+.new-book:hover .new-book-cover::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 252, 240, 0.7) 0%,
+    rgba(255, 248, 230, 0.3) 50%,
+    transparent 80%
+  );
+}
+
+/* 羽毛笔线条插画 */
+.new-book-illustration {
+  width: 36px;
+  height: 44px;
+  position: relative;
+  opacity: 0.4;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 3;
+}
+
+.new-book:hover .new-book-illustration {
+  opacity: 0.65;
+  transform: rotate(-5deg) translateY(-2px);
+}
+
+/* 文字 - 淡金色/暖灰色 */
+.new-book-text {
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', serif;
+  font-size: 0.85rem;
+  color: #B8A080;
+  transition: all var(--transition-normal);
+  z-index: 3;
+  letter-spacing: 0.1em;
+}
+
+.new-book:hover .new-book-text {
+  color: #9A7B50;
+}
+
+.new-book-hint {
+  font-size: 0.7rem;
+  color: transparent;
+  transition: all 0.4s ease;
+  position: absolute;
+  bottom: 35px;
+  z-index: 3;
+  letter-spacing: 0.15em;
+}
+
+.new-book:hover .new-book-hint {
+  color: #C9A86C;
+}
+
+.book-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  justify-content: center;
+  align-items: center;
+}
+
+.book-delete-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-delete-btn:hover {
+  background-color: var(--color-error-light);
+}
+
+.book-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Empty State - 简化为提示文字 */
+.bookshelf-row--empty {
+  justify-content: center;
+}
+
+.history-empty-hint {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin-top: var(--spacing-md);
+}
+
+/* Loading */
+.history-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* Delete Modal */
+.delete-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(56, 56, 56, 0.3);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-md);
+}
+
+.delete-modal {
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-xl);
+}
+
+.delete-modal-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.delete-modal-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.delete-modal-text {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--spacing-lg);
+  line-height: 1.6;
+}
+
+.delete-modal-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+}
+
+.delete-confirm-btn {
+  background-color: var(--color-error) !important;
+  border-color: var(--color-error) !important;
+}
+
+.delete-confirm-btn:hover {
+  background-color: #9A3F33 !important;
+  border-color: #9A3F33 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .history-page {
+    padding: var(--spacing-md) var(--spacing-md) 0;
+  }
+
+  .history-title {
+    font-size: 1.5rem;
+  }
+
+  .history-subtitle {
+    font-size: 0.875rem;
+  }
+
+  .bookshelf-row {
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-md);
+    min-height: 300px;
+  }
+
+  .book-cover {
+    width: 150px;
+    height: 200px;
+  }
+
+  .book-title {
+    font-size: 0.875rem;
+  }
+
+  .book-vision {
+    font-size: 0.625rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .bookshelf-wood {
+    bottom: 35px;
+    height: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .book-cover {
+    width: 130px;
+    height: 175px;
+  }
+
+  .book-content {
+    padding: var(--spacing-sm);
+    padding-left: calc(var(--spacing-sm) + 6px);
+  }
+
+  .book-status-emoji {
+    font-size: 1.25rem;
+  }
+
+  .book-title {
+    font-size: 0.75rem;
+  }
+
+  .bookshelf-wood {
+    bottom: 30px;
+    height: 4px;
+  }
+}

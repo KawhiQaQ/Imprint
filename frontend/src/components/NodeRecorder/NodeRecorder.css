@@ -1,0 +1,1309 @@
+/* ========================================
+   NodeRecorder - 日记书桌 (The Canvas)
+   铺开的信纸风格 - 撑满书页
+   ======================================== */
+
+.node-recorder {
+  position: relative;
+  background: linear-gradient(180deg, #FFFEF8 0%, #FBF9F3 100%);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden; /* 禁止滚动 */
+  /* 撑满父容器 */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 点亮后的样式 */
+.node-recorder--lit {
+  background: linear-gradient(180deg, #FFFEF5 0%, #FDF8E8 100%);
+}
+
+/* 入场动画 */
+.node-recorder--entering {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.node-recorder--entered {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.node-recorder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #5D7260 0%, #8BA889 50%, #5D7260 100%);
+  opacity: 0.6;
+}
+
+.node-recorder--lit::before {
+  background: linear-gradient(90deg, #C9A227 0%, #E8C547 50%, #C9A227 100%);
+  opacity: 0.8;
+}
+
+.node-recorder--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+  filter: grayscale(30%);
+}
+
+/* 点亮光晕效果 - 暖色光晕扫过 */
+.node-recorder--glowing {
+  animation: glowPulse 1.5s ease-out;
+}
+
+.node-recorder__glow-overlay {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg, 
+    transparent 0%,
+    rgba(255, 248, 220, 0.6) 20%,
+    rgba(255, 223, 150, 0.4) 50%,
+    rgba(255, 248, 220, 0.6) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
+  animation: glowSweep 1.2s ease-out forwards;
+  z-index: 10;
+}
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 0 rgba(201, 162, 39, 0); }
+  30% { box-shadow: 0 0 60px rgba(255, 223, 150, 0.5); }
+  100% { box-shadow: 0 0 0 rgba(201, 162, 39, 0); }
+}
+
+@keyframes glowSweep {
+  0% { 
+    left: -100%;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% { 
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+/* ========================================
+   A. 顶部：仪式感操作区
+   ======================================== */
+.node-recorder__ritual-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid rgba(93, 114, 96, 0.1);
+  flex-shrink: 0;
+}
+
+.node-recorder__title-section {
+  flex: 1;
+}
+
+.node-recorder__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: 2px;
+}
+
+.node-recorder__main-title {
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2D3A2E;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: 0.5px;
+}
+
+/* 红色印章 */
+.node-recorder__stamp {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #C94A4A;
+  border-radius: 50%;
+  transform: rotate(-15deg);
+  flex-shrink: 0;
+}
+
+.node-recorder__stamp-text {
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: #C94A4A;
+  font-family: 'Noto Serif SC', Georgia, serif;
+  letter-spacing: 0;
+  text-align: center;
+  line-height: 1.1;
+  /* 2x2排列 */
+  width: 2em;
+  word-break: break-all;
+}
+
+/* 印章盖下动画 */
+.node-recorder__stamp--animating {
+  animation: stampDown 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes stampDown {
+  0% {
+    transform: rotate(-15deg) scale(2) translateY(-20px);
+    opacity: 0;
+  }
+  60% {
+    transform: rotate(-15deg) scale(0.9);
+    opacity: 1;
+  }
+  80% {
+    transform: rotate(-15deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(-15deg) scale(1);
+  }
+}
+
+.node-recorder__time-moment {
+  font-family: 'Noto Serif SC', Georgia, serif;
+  font-size: 0.95rem;
+  color: #A8A4A0; /* 淡雅灰色 */
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+.node-recorder__lit-mark {
+  display: inline-block;
+  margin-left: var(--spacing-sm);
+  font-size: 0.8rem;
+  color: #C9A227;
+  font-weight: 500;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.node-recorder__status-tag {
+  display: inline-block;
+  margin-left: var(--spacing-sm);
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+.node-recorder__status-tag--changed {
+  background-color: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+}
+
+.node-recorder__status-tag--unrealized {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+}
+
+/* 快捷操作按钮 - 导航和详情 */
+.node-recorder__quick-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
+}
+
+.node-recorder__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background-color: rgba(93, 114, 96, 0.08);
+  border: 1px solid rgba(93, 114, 96, 0.2);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: #5D7260;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.node-recorder__action-btn:hover {
+  background-color: rgba(93, 114, 96, 0.15);
+  border-color: #5D7260;
+  transform: translateY(-1px);
+}
+
+.node-recorder__action-btn:active {
+  transform: translateY(0);
+}
+
+/* 点亮书签 - 右上角书签风格 */
+.node-recorder__bookmark-area {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.node-recorder__bookmark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: transparent;
+  border: none;
+  cursor: not-allowed;
+  opacity: 0.4;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.node-recorder__bookmark-icon {
+  width: 32px;
+  height: 32px;
+  color: #C8C4BC;
+  transition: all 0.3s ease;
+}
+
+.node-recorder__bookmark-label {
+  font-size: 0.7rem;
+  color: #A8A4A0;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+/* 可点亮状态 */
+.node-recorder__bookmark--ready {
+  cursor: pointer;
+  opacity: 1;
+}
+
+.node-recorder__bookmark--ready .node-recorder__bookmark-icon {
+  color: #D4A853;
+  animation: bookmarkPulse 2s ease-in-out infinite;
+}
+
+.node-recorder__bookmark--ready .node-recorder__bookmark-label {
+  color: #B8963F;
+}
+
+.node-recorder__bookmark--ready:hover {
+  transform: translateY(-2px);
+}
+
+.node-recorder__bookmark--ready:hover .node-recorder__bookmark-icon {
+  color: #C9A227;
+  transform: scale(1.1);
+}
+
+@keyframes bookmarkPulse {
+  0%, 100% { 
+    filter: drop-shadow(0 0 0 rgba(201, 162, 39, 0));
+  }
+  50% { 
+    filter: drop-shadow(0 0 8px rgba(201, 162, 39, 0.5));
+  }
+}
+
+/* 已点亮状态 */
+.node-recorder__bookmark--lit {
+  opacity: 1;
+  cursor: default;
+}
+
+.node-recorder__bookmark--lit .node-recorder__bookmark-icon {
+  color: #C9A227;
+  filter: drop-shadow(0 2px 4px rgba(201, 162, 39, 0.3));
+}
+
+.node-recorder__bookmark--lit .node-recorder__bookmark-label {
+  color: #B8963F;
+}
+
+/* 状态原因 */
+.node-recorder__status-reason {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(93, 114, 96, 0.05);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+  border-left: 3px solid rgba(93, 114, 96, 0.3);
+}
+
+.node-recorder__status-reason-label {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* 展开按钮 */
+.node-recorder__expand-btn {
+  width: 100%;
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  background: transparent;
+  border: 1px dashed rgba(93, 114, 96, 0.3);
+  border-radius: var(--radius-md);
+  color: #5D7260;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.node-recorder__expand-btn:hover {
+  background-color: rgba(93, 114, 96, 0.05);
+  border-color: #5D7260;
+}
+
+/* ========================================
+   天气与心情印章区 - 与照片框等宽
+   ======================================== */
+.node-recorder__stamps-area {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-sm);
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.node-recorder__stamp-row {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.node-recorder__stamp-label {
+  font-size: 0.7rem;
+  color: #8B8580;
+  flex-shrink: 0;
+}
+
+.node-recorder__stamp-options {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+}
+
+.node-recorder__stamp-btn {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1.5px solid #E0DDD6;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  /* 默认灰度 */
+  filter: grayscale(80%);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.node-recorder__stamp-btn:hover {
+  filter: grayscale(40%);
+  opacity: 0.8;
+  border-color: #C8C4BC;
+  transform: scale(1.05);
+}
+
+/* 选中状态 - 彩色实心 */
+.node-recorder__stamp-btn--selected {
+  filter: grayscale(0%);
+  opacity: 1;
+  border-color: #5D7260;
+  background-color: rgba(93, 114, 96, 0.08);
+  box-shadow: 0 2px 8px rgba(93, 114, 96, 0.2);
+}
+
+/* 盖章动画 */
+.node-recorder__stamp-btn--stamping {
+  animation: stampPress 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes stampPress {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(0.75);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.node-recorder__stamp-emoji {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+
+/* ========================================
+   B. 核心记录区 (Journaling)
+   ======================================== */
+.node-recorder__journal-area {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: all 0.4s ease;
+  flex: 1;
+  min-height: 0; /* 允许收缩 */
+}
+
+/* ========================================
+   Hero Image 照片区 - 拍立得风格
+   ======================================== */
+.node-recorder__hero-photo {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+}
+
+/* 拖拽时高亮 */
+.node-recorder__hero-photo--dragging {
+  background-color: rgba(93, 114, 96, 0.08);
+  box-shadow: inset 0 0 0 2px rgba(93, 114, 96, 0.4);
+}
+
+/* ========== 空状态：虚位以待的画布 ========== */
+.node-recorder__empty-canvas {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FDFBF7;
+  border: 2px dashed #D1D5DB;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.node-recorder__empty-canvas:hover {
+  background-color: #F9F7F2;
+  border-style: solid;
+  border-color: #8C9E89;
+  box-shadow: 0 4px 16px rgba(93, 114, 96, 0.1);
+}
+
+.node-recorder__empty-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.node-recorder__empty-icon {
+  width: 56px;
+  height: 56px;
+  color: #8C9E89;
+  opacity: 0.7;
+  transition: all 0.25s ease;
+}
+
+.node-recorder__empty-canvas:hover .node-recorder__empty-icon {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.node-recorder__empty-text {
+  font-size: 0.9rem;
+  color: #8B8580;
+  font-family: 'Noto Serif SC', Georgia, serif;
+  letter-spacing: 0.5px;
+}
+
+.node-recorder__empty-canvas:hover .node-recorder__empty-text {
+  color: #5D7260;
+}
+
+/* ========== 已上传状态：拍立得装裱效果 ========== */
+.node-recorder__polaroid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.node-recorder__polaroid-frame {
+  position: relative;
+  background: white;
+  padding: 12px 12px 32px 12px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 12px 32px rgba(0, 0, 0, 0.06);
+  transform: rotate(-1deg);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  max-width: 90%;
+  max-height: 100%;
+}
+
+.node-recorder__hero-photo:hover .node-recorder__polaroid-frame {
+  transform: rotate(0deg);
+  box-shadow: 
+    0 6px 16px rgba(0, 0, 0, 0.1),
+    0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
+.node-recorder__polaroid-frame img {
+  display: block;
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+/* 悬停更换蒙层 */
+.node-recorder__polaroid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0);
+  opacity: 0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border-radius: var(--radius-lg);
+}
+
+.node-recorder__hero-photo:hover .node-recorder__polaroid-overlay {
+  background-color: rgba(255, 255, 255, 0.7);
+  opacity: 1;
+}
+
+.node-recorder__polaroid-change-text {
+  padding: 10px 20px;
+  background-color: #5D7260;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 12px rgba(93, 114, 96, 0.3);
+  transform: translateY(8px);
+  transition: transform 0.25s ease;
+}
+
+.node-recorder__hero-photo:hover .node-recorder__polaroid-change-text {
+  transform: translateY(0);
+}
+
+/* 删除按钮 - 右上角小圆点 */
+.node-recorder__polaroid-delete {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(239, 68, 68, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.node-recorder__hero-photo:hover .node-recorder__polaroid-delete {
+  opacity: 1;
+}
+
+.node-recorder__polaroid-delete:hover {
+  background-color: #EF4444;
+  transform: scale(1.1);
+}
+
+.node-recorder__file-input {
+  display: none;
+}
+
+/* 照片时间确认 - 内联样式（与文字框时间选择一致） */
+.node-recorder__photo-time-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: #FFFEF8;
+  border: 1px solid rgba(93, 114, 96, 0.2);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.node-recorder__photo-time-label {
+  font-size: 0.8rem;
+  color: #3D4A3E;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.node-recorder__photo-time-input-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.node-recorder__photo-time-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-left: auto;
+}
+
+/* 文字记录列表 */
+.node-recorder__notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: 650px; /* 限制宽度保持最佳阅读体验 */
+}
+
+.node-recorder__note-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-md);
+  position: relative;
+}
+
+.node-recorder__note-time {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #5D7260;
+  padding: 2px 8px;
+  background-color: rgba(93, 114, 96, 0.1);
+  border-radius: var(--radius-full);
+}
+
+.node-recorder__note-content {
+  flex: 1;
+  font-size: 0.95rem;
+  color: #3D4A3E;
+  line-height: 1.8; /* 散文般的行高 */
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', Georgia, serif;
+}
+
+.node-recorder__note-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(239, 68, 68, 0.8);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.node-recorder__note-item:hover .node-recorder__note-delete {
+  opacity: 1;
+}
+
+
+/* 3. 文字日记输入区 - 紧贴照片下方 */
+.node-recorder__text-area {
+  flex-shrink: 0;
+  margin-top: 0; /* 紧贴照片 */
+}
+
+.node-recorder__text-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-xs);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(93, 114, 96, 0.15);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: #A8A4A0;
+  text-align: left;
+}
+
+.node-recorder__text-trigger:hover {
+  color: #5D7260;
+  border-bottom-color: #5D7260;
+}
+
+/* 文字编辑器 - 与照片视觉融合 */
+.node-recorder__text-editor {
+  padding: var(--spacing-sm);
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  border-top: none; /* 去掉上边框，与照片融合 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+@keyframes editorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.node-recorder__text-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #3D4A3E;
+}
+
+.node-recorder__text-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.node-recorder__time-label {
+  font-size: 0.8rem;
+  color: #8B8580;
+}
+
+.node-recorder__time-input {
+  width: auto;
+  min-width: 80px;
+  padding: 4px 8px;
+  border: 1px solid #E0DDD6;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-family: inherit;
+  background-color: #FAFAF8;
+  color: #3D4A3E;
+  cursor: pointer;
+}
+
+.node-recorder__time-input:focus {
+  outline: none;
+  border-color: #5D7260;
+  background-color: #FFFFFF;
+}
+
+/* 隐藏time input的默认图标（部分浏览器） */
+.node-recorder__time-input::-webkit-calendar-picker-indicator {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.node-recorder__time-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+.node-recorder__textarea-container {
+  position: relative;
+}
+
+/* 简洁文本框 */
+.node-recorder__textarea {
+  width: 100%;
+  padding: 6px var(--spacing-sm);
+  padding-right: 36px;
+  background-color: #FAFAF8;
+  border: 1px solid #E8E5DE;
+  border-radius: var(--radius-md);
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', Georgia, serif;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #3D4A3E;
+  resize: none;
+  min-height: 36px;
+}
+
+.node-recorder__textarea:focus {
+  outline: none;
+  border-color: #5D7260;
+  background-color: #FFFFFF;
+}
+
+.node-recorder__textarea::placeholder {
+  color: #B8B4B0;
+  font-style: italic;
+}
+
+.node-recorder__voice-btn {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F5F3EE;
+  border: 1px solid #E0DDD6;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.node-recorder__voice-btn:hover {
+  background-color: #5D7260;
+  border-color: #5D7260;
+  color: white;
+}
+
+.node-recorder__voice-btn--recording {
+  background-color: #EF4444;
+  border-color: #EF4444;
+  color: white;
+  animation: pulse-recording 1s infinite;
+}
+
+@keyframes pulse-recording {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.node-recorder__recording-indicator {
+  font-size: 0.7rem;
+  color: #EF4444;
+  margin-top: 4px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.node-recorder__text-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-xs);
+  margin-top: 4px;
+}
+
+/* 重新生成区域 */
+.node-recorder__regenerate-area {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--spacing-sm);
+  border-top: 1px dashed rgba(93, 114, 96, 0.2);
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+/* ========================================
+   C. 底部：功能栏
+   ======================================== */
+.node-recorder__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xs);
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid rgba(93, 114, 96, 0.1);
+  flex-shrink: 0;
+}
+
+.node-recorder__footer-link {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: #A8A4A0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0;
+}
+
+.node-recorder__footer-link:hover {
+  color: #5D7260;
+}
+
+.node-recorder__footer-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   Modal 弹窗样式
+   ======================================== */
+.node-recorder__modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-md);
+  backdrop-filter: blur(2px);
+}
+
+.node-recorder__modal {
+  background-color: #FFFEF8;
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+/* 大型弹窗 - 添加更多内容 */
+.node-recorder__modal--large {
+  max-width: 600px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.node-recorder__modal--large .node-recorder__modal-body {
+  flex: 1;
+  overflow: hidden;
+}
+
+.node-recorder__modal-body--scrollable {
+  overflow-y: auto;
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+/* 弹窗内的印章区 */
+.node-recorder__modal--large .node-recorder__stamps-area {
+  border-bottom: none;
+  margin-bottom: var(--spacing-sm);
+  padding: 0;
+}
+
+/* 弹窗内的照片格 */
+.node-recorder__modal--large .node-recorder__photo-grid {
+  flex: none;
+  margin-bottom: var(--spacing-md);
+}
+
+.node-recorder__modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid rgba(93, 114, 96, 0.1);
+}
+
+.node-recorder__modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2D3A2E;
+  font-family: 'Noto Serif SC', Georgia, serif;
+}
+
+.node-recorder__modal-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #A8A4A0;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.node-recorder__modal-close:hover {
+  background-color: rgba(93, 114, 96, 0.1);
+  color: #5D7260;
+}
+
+.node-recorder__modal-body {
+  padding: var(--spacing-lg);
+}
+
+.node-recorder__modal-field {
+  margin-bottom: var(--spacing-md);
+}
+
+.node-recorder__modal-field:last-child {
+  margin-bottom: 0;
+}
+
+.node-recorder__modal-field label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #3D4A3E;
+  margin-bottom: var(--spacing-xs);
+}
+
+.node-recorder__modal-field input,
+.node-recorder__modal-field textarea {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid #E0DDD6;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-family: inherit;
+  background-color: #FFFFFF;
+  transition: border-color 0.2s ease;
+}
+
+.node-recorder__modal-field input:focus,
+.node-recorder__modal-field textarea:focus {
+  outline: none;
+  border-color: #5D7260;
+}
+
+.node-recorder__modal-field textarea {
+  resize: vertical;
+  min-height: 80px;
+  padding-right: 44px; /* 为语音按钮留出空间 */
+}
+
+/* 弹窗内textarea容器 */
+.node-recorder__modal-textarea-wrap {
+  position: relative;
+}
+
+/* 弹窗内语音按钮 */
+.node-recorder__modal-voice-btn {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F5F3EE;
+  border: 1px solid #E0DDD6;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.node-recorder__modal-voice-btn:hover {
+  background-color: #5D7260;
+  border-color: #5D7260;
+  color: white;
+}
+
+.node-recorder__modal-voice-btn--recording {
+  background-color: #EF4444;
+  border-color: #EF4444;
+  color: white;
+  animation: pulse-recording 1s infinite;
+}
+
+.node-recorder__modal-original {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(93, 114, 96, 0.05);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  color: #5D7260;
+}
+
+.node-recorder__modal-select-btn {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid #E0DDD6;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-family: inherit;
+  background-color: #FFFFFF;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease;
+}
+
+.node-recorder__modal-select-btn:hover {
+  border-color: #5D7260;
+}
+
+.node-recorder__modal-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background-color: #F9F8F6;
+  border-radius: var(--radius-md);
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.node-recorder__modal-picker--mood {
+  max-height: 200px;
+}
+
+.node-recorder__modal-picker-item {
+  padding: 4px 10px;
+  border: 1px solid #E0DDD6;
+  border-radius: var(--radius-full);
+  background-color: #FFFFFF;
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.node-recorder__modal-picker-item:hover {
+  background-color: rgba(93, 114, 96, 0.1);
+  border-color: #5D7260;
+}
+
+.node-recorder__modal-picker-item--selected {
+  background-color: #5D7260;
+  border-color: #5D7260;
+  color: white;
+}
+
+.node-recorder__modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid rgba(93, 114, 96, 0.1);
+}
+
+/* ========================================
+   响应式适配
+   ======================================== */
+@media (max-width: 640px) {
+  .node-recorder {
+    padding: var(--spacing-md);
+    border-radius: 0;
+  }
+
+  .node-recorder__ritual-header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .node-recorder__main-title {
+    font-size: 1.25rem;
+  }
+
+  .node-recorder__light-switch {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* 天气心情区域在小屏幕上垂直排列 */
+  .node-recorder__stamps-area {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .node-recorder__stamp-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .node-recorder__stamp-emoji {
+    font-size: 1rem;
+  }
+
+  /* Hero 照片区高度调整 */
+  .node-recorder__hero-photo {
+    height: 220px;
+  }
+
+  .node-recorder__polaroid-frame img {
+    max-height: 160px;
+  }
+
+  .node-recorder__footer {
+    justify-content: center;
+  }
+}
+
+@media (min-width: 1200px) {
+  .node-recorder {
+    padding: var(--spacing-2xl) calc(var(--spacing-2xl) * 2);
+  }
+  
+  .node-recorder__main-title {
+    font-size: 1.75rem;
+  }
+
+  .node-recorder__stamp-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .node-recorder__stamp-emoji {
+    font-size: 1.2rem;
+  }
+
+  /* Hero 照片区在大屏幕上更大 */
+  .node-recorder__hero-photo {
+    height: 320px;
+  }
+
+  .node-recorder__polaroid-frame img {
+    max-height: 240px;
+  }
+}

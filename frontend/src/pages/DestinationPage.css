@@ -1,0 +1,629 @@
+/* ========================================
+   DestinationPage - 苔原静谧 (Moss & Mist) Theme
+   左右平衡布局 (Asymmetrical Balance)
+   左侧：缘侧（控制区）30%
+   右侧：借景（展示区）70%
+   ======================================== */
+
+.destination-page {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.destination-page--entered {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========================================
+   左侧面板 - 缘侧（控制区）
+   极度克制的设计
+   ======================================== */
+.destination-page__left-panel {
+  width: 30%;
+  min-width: 320px;
+  max-width: 420px;
+  height: 100%;
+  background-color: #F5F5F3;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  overflow-y: auto;
+  position: relative;
+  /* 纸质纹理效果 */
+  background-image: 
+    linear-gradient(90deg, rgba(0,0,0,0.008) 1px, transparent 1px),
+    linear-gradient(rgba(0,0,0,0.008) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 返回链接 */
+.destination-page__back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  margin-bottom: var(--spacing-2xl);
+  transition: color var(--transition-fast);
+  text-decoration: none;
+  opacity: 0.7;
+}
+
+.destination-page__back-link:hover {
+  color: var(--color-primary);
+  opacity: 1;
+}
+
+/* Header - 隐藏原标题，愿景作为主标题 */
+.destination-page__header {
+  display: none;
+}
+
+/* ========================================
+   A. 愿景回顾 - 俳句/引言样式
+   ======================================== */
+.destination-page__vision-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--spacing-xl) 0;
+}
+
+.destination-page__vision-text {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.destination-page__vision-label {
+  font-size: 0.625rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  letter-spacing: 0.2em;
+  margin-bottom: var(--spacing-md);
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.destination-page__vision-content {
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: #383838;
+  line-height: 2;
+  letter-spacing: 0.05em;
+  margin: 0;
+  font-style: normal;
+  /* 大行距的衬线体效果 */
+}
+
+.destination-page__vision-content::before,
+.destination-page__vision-content::after {
+  content: none;
+}
+
+/* ========================================
+   选中城市简介 - 动态显示
+   ======================================== */
+.destination-page__selected-info {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid rgba(93, 114, 96, 0.15);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 0;
+  overflow: hidden;
+}
+
+.destination-page__selected-info--visible {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 300px;
+}
+
+.destination-page__selected-city {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #383838;
+  margin: 0 0 var(--spacing-xs) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.destination-page__selected-province {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.destination-page__selected-reason {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+  margin: var(--spacing-sm) 0 0 0;
+}
+
+.destination-page__selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-md);
+}
+
+.destination-page__selected-tag {
+  font-size: 0.6875rem;
+  color: var(--color-primary);
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(93, 114, 96, 0.08);
+  border-radius: var(--radius-full);
+}
+
+/* ========================================
+   B. 日期与时间 - 极简时间轴
+   ======================================== */
+.destination-page__date-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: auto;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+.destination-page__date-picker-title {
+  display: none;
+}
+
+/* 日期摘要显示 */
+.destination-page__date-summary {
+  font-size: 0.875rem;
+  color: #383838;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--color-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+}
+
+.destination-page__date-summary:hover {
+  color: var(--color-primary);
+}
+
+.destination-page__date-summary-text {
+  font-family: 'Noto Serif SC', serif;
+  letter-spacing: 0.02em;
+}
+
+.destination-page__date-summary-icon {
+  font-size: 0.75rem;
+  opacity: 0.5;
+  transition: transform var(--transition-fast);
+}
+
+.destination-page__date-summary-icon--expanded {
+  transform: rotate(180deg);
+}
+
+/* 展开的日期选择器 */
+.destination-page__date-expanded {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0;
+}
+
+.destination-page__date-expanded--open {
+  max-height: 300px;
+  padding: var(--spacing-md) 0;
+}
+
+.destination-page__date-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.destination-page__date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.destination-page__date-label {
+  font-size: 0.625rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.destination-page__date-input,
+.destination-page__days-select,
+.destination-page__time-select {
+  padding: 8px 0;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background-color: transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+.destination-page__date-input:hover,
+.destination-page__days-select:hover,
+.destination-page__time-select:hover {
+  border-bottom-color: var(--color-primary);
+}
+
+.destination-page__date-input:focus,
+.destination-page__days-select:focus,
+.destination-page__time-select:focus {
+  outline: none;
+  border-bottom-color: var(--color-primary);
+  box-shadow: none;
+}
+
+/* ========================================
+   C. 底部操作区 - 极简设计
+   ======================================== */
+.destination-page__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+}
+
+/* 换一批 - 圆形图标按钮（枯山水石头） */
+.destination-page__refresh-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  background-color: rgba(93, 114, 96, 0.08);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
+.destination-page__refresh-btn:hover {
+  background-color: rgba(93, 114, 96, 0.15);
+  color: var(--color-primary);
+  transform: rotate(180deg);
+}
+
+.destination-page__refresh-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.destination-page__refresh-btn--loading {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 确认按钮 - 只在选择城市后显示 */
+.destination-page__confirm-btn {
+  flex: 1;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  letter-spacing: 0.05em;
+}
+
+.destination-page__confirm-btn--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.destination-page__confirm-btn:hover:not(:disabled) {
+  background-color: #4a5c4d;
+  box-shadow: 0 4px 20px rgba(93, 114, 96, 0.3);
+}
+
+.destination-page__confirm-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.destination-page__confirm-btn--loading {
+  position: relative;
+  color: transparent;
+}
+
+.destination-page__confirm-btn--loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* 隐藏原有按钮样式 */
+.destination-page__actions .btn {
+  display: none;
+}
+
+/* ========================================
+   右侧面板 - 借景（展示区）
+   挂轴 (Hanging Scrolls) 设计
+   ======================================== */
+.destination-page__right-panel {
+  flex: 1;
+  height: 100%;
+  background-color: #FAFAF8;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0;
+}
+
+/* 挂轴容器 - 4幅竖向长画幅 */
+.destination-page__scrolls {
+  display: flex;
+  height: 80vh;
+  gap: 2px;
+  padding: 0 var(--spacing-md);
+}
+
+/* 隐藏原有的 grid 布局 */
+.destination-page__grid {
+  display: none;
+}
+
+.destination-page__card-wrapper {
+  display: contents;
+}
+
+@keyframes cardFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 旧的 container 样式（用于加载/错误/空状态） */
+.destination-page__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+}
+
+/* Loading State */
+.destination-page__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: var(--spacing-md);
+  width: 100%;
+  height: 100vh;
+}
+
+.destination-page__loading-text {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+}
+
+/* Error State */
+.destination-page__error {
+  text-align: center;
+  padding: var(--spacing-2xl);
+}
+
+.destination-page__error-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.destination-page__error-message {
+  font-size: 1rem;
+  color: var(--color-error);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Empty State */
+.destination-page__empty {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.destination-page__empty-icon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.6;
+}
+
+.destination-page__empty-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.destination-page__empty-text {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ========================================
+   响应式设计
+   ======================================== */
+
+/* 大屏幕 */
+@media (min-width: 1400px) {
+  .destination-page__scrolls {
+    height: 85vh;
+    padding: 0 var(--spacing-xl);
+  }
+}
+
+/* 中等屏幕 */
+@media (max-width: 1200px) {
+  .destination-page__left-panel {
+    width: 35%;
+    min-width: 280px;
+  }
+  
+  .destination-page__vision-content {
+    font-size: 1.5rem;
+  }
+  
+  .destination-page__scrolls {
+    height: 75vh;
+  }
+}
+
+/* 平板 */
+@media (max-width: 900px) {
+  .destination-page {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .destination-page__left-panel {
+    width: 100%;
+    max-width: none;
+    min-width: auto;
+    height: auto;
+    padding: var(--spacing-lg);
+  }
+  
+  .destination-page__vision-section {
+    padding: var(--spacing-md) 0;
+  }
+  
+  .destination-page__vision-content {
+    font-size: 1.375rem;
+  }
+  
+  .destination-page__right-panel {
+    height: auto;
+    min-height: auto;
+    padding: var(--spacing-md);
+  }
+  
+  /* 平板改为网格布局 */
+  .destination-page__scrolls {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    height: auto;
+    gap: var(--spacing-md);
+    padding: 0;
+  }
+  
+  .destination-page__date-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .destination-page__actions {
+    flex-direction: row;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+  }
+  
+  .destination-page__confirm-btn {
+    flex: 1;
+  }
+}
+
+/* 手机 */
+@media (max-width: 640px) {
+  .destination-page__left-panel {
+    padding: var(--spacing-md);
+  }
+  
+  .destination-page__right-panel {
+    padding: var(--spacing-sm);
+  }
+  
+  .destination-page__vision-content {
+    font-size: 1.25rem;
+    line-height: 1.8;
+  }
+  
+  .destination-page__date-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .destination-page__actions {
+    flex-direction: row;
+    gap: var(--spacing-sm);
+  }
+  
+  .destination-page__refresh-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+  
+  .destination-page__confirm-btn {
+    font-size: 0.875rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+  
+  /* 手机改为单列 */
+  .destination-page__scrolls {
+    grid-template-columns: 1fr;
+  }
+}

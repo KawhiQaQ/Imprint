@@ -1,0 +1,1922 @@
+/* ========================================
+   MemoirViewer - 沉浸式横向画册
+   Immersive Horizontal Slider
+   苔原静谧 (Moss & Mist) Theme
+   ======================================== */
+
+/* 主容器 - 全屏锁定 */
+.memoir-viewer--immersive {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--color-canvas);
+  user-select: none;
+}
+
+/* 幻灯片轨道 */
+.memoir-viewer__slides {
+  display: flex;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* 单个幻灯片包装器 */
+.memoir-viewer__slide-wrapper {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 通用幻灯片样式 */
+.memoir-slide {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* ========================================
+   A. 封面页 (Cover Slide)
+   全屏铺满 + 纸质纹理 + 竖排标题
+   ======================================== */
+.memoir-slide--cover {
+  position: relative;
+  overflow: hidden;
+}
+
+.memoir-slide__cover-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.memoir-slide__cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.9) saturate(0.85);
+}
+
+/* 纸质纹理叠加层 */
+.memoir-slide__cover-texture {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.08;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.memoir-slide__cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(107, 142, 126, 0.25) 0%,
+    rgba(56, 56, 56, 0.35) 100%
+  );
+}
+
+/* 内容层 */
+.memoir-slide__cover-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  padding: var(--spacing-2xl) calc(var(--spacing-2xl) * 2);
+}
+
+/* 竖排标题区域 */
+.memoir-slide__cover-title-area {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.memoir-slide__cover-title--vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin: 0;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.memoir-slide__cover-title-main {
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 200;
+  font-family: var(--font-serif);
+  letter-spacing: 0.15em;
+  line-height: 1.4;
+}
+
+.memoir-slide__cover-title-dot {
+  font-size: 1.5rem;
+  opacity: 0.6;
+  margin: var(--spacing-sm) 0;
+}
+
+.memoir-slide__cover-title-sub {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 300;
+  font-family: var(--font-serif);
+  letter-spacing: 0.2em;
+  opacity: 0.9;
+}
+
+/* 落款 */
+.memoir-slide__cover-meta {
+  position: absolute;
+  bottom: var(--spacing-2xl);
+  right: calc(var(--spacing-2xl) * 2);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  color: #fff;
+}
+
+.memoir-slide__cover-date {
+  font-size: 0.875rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  opacity: 0.8;
+}
+
+.memoir-slide__cover-badge {
+  font-size: 0.625rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  opacity: 0.6;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+/* 翻页提示 */
+.memoir-slide__cover-hint {
+  position: absolute;
+  bottom: var(--spacing-2xl);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: #fff;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity var(--transition-normal);
+  animation: hintPulse 2.5s ease-in-out infinite;
+}
+
+.memoir-slide__cover-hint:hover {
+  opacity: 1;
+}
+
+.memoir-slide__cover-hint-text {
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  font-weight: 300;
+}
+
+.memoir-slide__cover-hint-arrow {
+  display: flex;
+  align-items: center;
+  animation: hintArrow 1.5s ease-in-out infinite;
+}
+
+.memoir-slide__cover-hint-arrow svg {
+  width: 16px;
+  height: 16px;
+}
+
+@keyframes hintPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes hintArrow {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
+
+/* ========================================
+   开篇页 (Opening Slide)
+   ======================================== */
+.memoir-slide--opening {
+  background: linear-gradient(
+    135deg,
+    var(--color-canvas) 0%,
+    var(--color-bg-elevated) 100%
+  );
+}
+
+.memoir-slide__opening-content {
+  max-width: 700px;
+  padding: var(--spacing-2xl);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.memoir-slide__opening-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.8;
+}
+
+.memoir-slide__opening-text {
+  font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+  line-height: 2.2;
+  color: var(--color-text);
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-style: italic;
+  margin: 0;
+  padding: 0 var(--spacing-lg);
+  border: none;
+  position: relative;
+}
+
+.memoir-slide__opening-text::before,
+.memoir-slide__opening-text::after {
+  content: '"';
+  font-size: 3rem;
+  color: var(--color-primary-light);
+  font-family: Georgia, serif;
+  position: absolute;
+  opacity: 0.4;
+}
+
+.memoir-slide__opening-text::before {
+  top: -1rem;
+  left: -0.5rem;
+}
+
+.memoir-slide__opening-text::after {
+  content: '"';
+  bottom: -2rem;
+  right: -0.5rem;
+}
+
+.memoir-slide__opening-decoration {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  margin-top: var(--spacing-xl);
+}
+
+/* ========================================
+   B. 章节页 (Chapter Slide)
+   根据照片比例动态切换布局
+   ======================================== */
+
+/* ========== 竖版/方形照片：挂轴画意布局 (The Vertical Scroll) ========== */
+.memoir-slide--chapter-scroll {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  gap: 0;
+  padding: 0;
+}
+
+/* 左侧视觉区 - 挂轴式 */
+.memoir-slide__scroll-visual {
+  position: relative;
+  height: 100%;
+  background: linear-gradient(135deg, #e8f8ff 0%, #f5fcff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: var(--spacing-xl);
+}
+
+.memoir-slide__scroll-photo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  height: 100%;
+  width: 100%;
+  position: relative; /* 确保印章能相对于此容器定位 */
+}
+
+.memoir-slide__scroll-photo-frame {
+  position: relative;
+  background: #F5F5F3;
+  padding: 8px;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.memoir-slide__scroll-photo {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  z-index: 1;
+}
+
+.memoir-slide__scroll-more {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.memoir-slide__scroll-thumb {
+  width: 48px;
+  height: 48px;
+  background: white;
+  padding: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.memoir-slide__scroll-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 右侧文字区 */
+.memoir-slide__scroll-text {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: linear-gradient(135deg, #e0f4ff 0%, #f0faff 100%);
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ========== 日式装裱 (The Mounting) ========== */
+.memoir-slide__mounted-frame {
+  position: relative;
+  background: #FFFFFF; /* 纯白画芯 */
+  padding: 12px; /* 12px 白边 */
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.12),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.06); /* 极细浅灰边框 */
+}
+
+/* 横版邮票框架 - 固定尺寸 */
+.memoir-slide__mounted-frame--landscape {
+  width: 520px;
+  height: 360px;
+}
+
+/* 竖版邮票框架 - 固定尺寸（大尺寸） */
+.memoir-slide__mounted-frame--portrait {
+  width: 380px;
+  height: 520px;
+}
+
+/* 方形/未知比例邮票框架 */
+.memoir-slide__mounted-frame--square {
+  width: 420px;
+  height: 420px;
+}
+
+.memoir-slide__mounted-inner {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 24px); /* 减去底部元数据区域高度 */
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08); /* 1px 浅灰边框 */
+  background: #F5F5F3;
+}
+
+.memoir-slide__mounted-photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 统一使用 cover 填满 */
+  z-index: 1;
+}
+
+/* 元数据落款 - 在白边上 */
+.memoir-slide__photo-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: #B8B4B0;
+  letter-spacing: 0.5px;
+}
+
+.memoir-slide__photo-meta-date {
+  opacity: 0.8;
+}
+
+.memoir-slide__photo-meta-loc {
+  opacity: 0.6;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ========== 朱砂印章 (Vermilion Seal) ========== */
+.memoir-slide__seal {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 朱砂红色调 */
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(180, 50, 40, 0.85) 0%,
+    rgba(160, 40, 35, 0.9) 50%,
+    rgba(140, 35, 30, 0.95) 100%
+  );
+  border-radius: 4px;
+  transform: rotate(-8deg);
+  box-shadow: 
+    0 2px 8px rgba(140, 35, 30, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  /* 印章磨损效果 */
+  filter: contrast(1.1);
+  z-index: 10;
+}
+
+.memoir-slide__seal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  /* 模拟印泥不均匀 */
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+}
+
+.memoir-slide__seal--cinematic {
+  bottom: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+}
+
+/* 竖版照片布局中的外部印章 - 放在照片区域右下角，不在照片框内 */
+.memoir-slide__seal--scroll-external {
+  position: absolute;
+  bottom: 60px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  z-index: 20;
+}
+
+.memoir-slide__seal-char {
+  position: relative;
+  z-index: 1;
+  font-size: 1.25rem;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+/* ========== 横版照片：宽幅电影布局 (The Cinematic Wide) ========== */
+.memoir-slide--chapter-cinematic {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+/* 上部照片区 - 60% 高度 */
+.memoir-slide__cinematic-visual {
+  position: relative;
+  height: 60%;
+  background: linear-gradient(135deg, #e8f8ff 0%, #f5fcff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: var(--spacing-lg);
+}
+
+.memoir-slide__cinematic-thumbs {
+  position: absolute;
+  bottom: var(--spacing-md);
+  right: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.memoir-slide__cinematic-thumb {
+  width: 40px;
+  height: 30px;
+  background: white;
+  padding: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  opacity: 0.9;
+  transition: opacity 0.2s ease;
+}
+
+.memoir-slide__cinematic-thumb:hover {
+  opacity: 1;
+}
+
+.memoir-slide__cinematic-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 下部文字区 - 40% 高度，三栏式布局 */
+.memoir-slide__cinematic-text {
+  height: 40%;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  background: linear-gradient(135deg, #e0f4ff 0%, #f0faff 100%);
+  align-items: start;
+  overflow: hidden;
+}
+
+/* 左栏：序号与标题 */
+.memoir-slide__cinematic-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.memoir-slide__cinematic-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.memoir-slide__cinematic-time {
+  font-size: 1.5rem;
+  font-weight: 200;
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  letter-spacing: 2px;
+  opacity: 0.6;
+}
+
+/* 中栏：日记文本 */
+.memoir-slide__cinematic-body {
+  min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  padding-right: var(--spacing-sm);
+}
+
+.memoir-slide__cinematic-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.memoir-slide__cinematic-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.memoir-slide__cinematic-body::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+}
+
+.memoir-slide__cinematic-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.memoir-slide__cinematic-poetry {
+  column-count: 2;
+  column-gap: var(--spacing-xl);
+}
+
+.memoir-slide__cinematic-poetry .memoir-slide__chapter-line {
+  break-inside: avoid;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* 右栏：留空占位 */
+.memoir-slide__cinematic-spacer {
+  width: 48px;
+  flex-shrink: 0;
+}
+
+/* ========== 通用章节页样式 ========== */
+
+/* 模糊弥散背景层 - The Halo Effect */
+.memoir-slide__chapter-photo-blur {
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(60px);
+  opacity: 0.5;
+  z-index: 0;
+}
+
+/* 无照片占位 - 优雅的加载状态 */
+.memoir-slide__chapter-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(107, 142, 126, 0.1) 0%,
+    rgba(107, 142, 126, 0.05) 100%
+  );
+}
+
+.memoir-slide__chapter-placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  animation: placeholderPulse 2s ease-in-out infinite;
+}
+
+.memoir-slide__chapter-placeholder-emoji {
+  font-size: 3rem;
+  opacity: 0.5;
+}
+
+.memoir-slide__chapter-placeholder-text {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  letter-spacing: 2px;
+  opacity: 0.6;
+}
+
+@keyframes placeholderPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+}
+
+/* 右侧文字留白区 */
+.memoir-slide__chapter-text {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background-color: #F5F5F3;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 角落序号 */
+.memoir-slide__chapter-index-area {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.memoir-slide__chapter-index {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  letter-spacing: 1px;
+  font-family: var(--font-mono);
+}
+
+.memoir-slide__chapter-index-label {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  font-weight: 400;
+}
+
+/* 时间 */
+.memoir-slide__chapter-time {
+  font-size: 2rem;
+  font-weight: 200;
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  letter-spacing: 2px;
+  margin-bottom: var(--spacing-xl);
+  opacity: 0.7;
+}
+
+/* 诗歌式日记文本 */
+.memoir-slide__chapter-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding-right: var(--spacing-sm);
+}
+
+.memoir-slide__chapter-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.memoir-slide__chapter-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.memoir-slide__chapter-body::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+}
+
+.memoir-slide__chapter-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.memoir-slide__chapter-poetry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.memoir-slide__chapter-line {
+  font-size: 1rem;
+  line-height: 2;
+  color: var(--color-text);
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   结语页 (Closing Slide)
+   ======================================== */
+.memoir-slide--closing {
+  background: linear-gradient(
+    135deg,
+    #fefce8 0%,
+    #fef9c3 50%,
+    var(--color-canvas) 100%
+  );
+}
+
+.memoir-slide__closing-content {
+  max-width: 700px;
+  padding: var(--spacing-2xl);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.memoir-slide__closing-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.memoir-slide__closing-text {
+  font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+  line-height: 2.2;
+  color: var(--color-text);
+  font-family: var(--font-serif);
+  font-weight: 500;
+  margin: 0;
+  padding: 0 var(--spacing-lg);
+  border: none;
+  text-align: center;
+}
+
+.memoir-slide__closing-decoration {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+  margin-top: var(--spacing-xl);
+}
+
+
+/* ========================================
+   C. 旅行人格页 (Personality Slide)
+   星图样式 + 标签云 + 呼吸动效
+   ======================================== */
+.memoir-slide--personality {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    #0f172a 0%,
+    #1e293b 50%,
+    #0f172a 100%
+  );
+  overflow: hidden;
+}
+
+/* 星空背景 */
+.memoir-slide__personality-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.memoir-slide__personality-stars {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(2px 2px at 130px 80px, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 160px 120px, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(2px 2px at 200px 50px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 250px 160px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(2px 2px at 300px 90px, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 350px 200px;
+  animation: twinkle 8s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* 居中悬浮卡片 */
+.memoir-slide__personality-card {
+  position: relative;
+  z-index: 2;
+  max-width: 500px;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-2xl);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+/* 称号 - 艺术字体 */
+.memoir-slide__personality-title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0 0 var(--spacing-md) 0;
+  font-family: var(--font-serif);
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #0891b2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.memoir-slide__personality-desc {
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-xl) 0;
+  opacity: 0.85;
+}
+
+/* 星图式数据展示 */
+.memoir-slide__personality-constellation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-lg) 0;
+  position: relative;
+}
+
+.memoir-slide__personality-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  position: relative;
+  padding: 0 var(--spacing-lg);
+}
+
+.memoir-slide__personality-stat-value {
+  font-size: 2.5rem;
+  font-weight: 200;
+  color: var(--color-primary);
+  line-height: 1;
+  font-family: var(--font-mono);
+}
+
+.memoir-slide__personality-stat-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  letter-spacing: 1px;
+}
+
+/* 星点装饰 */
+.memoir-slide__personality-stat-star {
+  position: absolute;
+  top: -8px;
+  right: 50%;
+  transform: translateX(50%);
+  width: 6px;
+  height: 6px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-primary);
+  animation: starPulse 2s ease-in-out infinite;
+}
+
+.memoir-slide__personality-stat--nodes .memoir-slide__personality-stat-star {
+  animation-delay: 0.3s;
+}
+
+.memoir-slide__personality-stat--photos .memoir-slide__personality-stat-star {
+  animation-delay: 0.6s;
+}
+
+@keyframes starPulse {
+  0%, 100% { transform: translateX(50%) scale(1); opacity: 1; }
+  50% { transform: translateX(50%) scale(1.5); opacity: 0.6; }
+}
+
+/* 连接线 */
+.memoir-slide__personality-stat-line {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-primary), rgba(6, 182, 212, 0.3));
+  position: relative;
+}
+
+.memoir-slide__personality-stat-line::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: inherit;
+  animation: lineGlow 2s ease-in-out infinite;
+}
+
+@keyframes lineGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* 心情展示 */
+.memoir-slide__personality-moods {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.memoir-slide__personality-mood {
+  font-size: 1.5rem;
+  animation: moodFloat 3s ease-in-out infinite;
+}
+
+.memoir-slide__personality-mood:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.memoir-slide__personality-mood:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes moodFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* 标签云 - 散落在周围 */
+.memoir-slide__personality-tags {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.memoir-slide__personality-tag {
+  position: absolute;
+  font-size: 0.875rem;
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  animation: tagBreath 4s ease-in-out infinite;
+}
+
+/* 标签位置分布 */
+.memoir-slide__personality-tag--0 {
+  top: 15%;
+  left: 10%;
+}
+
+.memoir-slide__personality-tag--1 {
+  top: 25%;
+  right: 12%;
+  animation-delay: 0.5s;
+}
+
+.memoir-slide__personality-tag--2 {
+  bottom: 30%;
+  left: 8%;
+  animation-delay: 1s;
+}
+
+.memoir-slide__personality-tag--3 {
+  bottom: 20%;
+  right: 15%;
+  animation-delay: 1.5s;
+}
+
+.memoir-slide__personality-tag--4 {
+  top: 40%;
+  left: 5%;
+  animation-delay: 2s;
+}
+
+@keyframes tagBreath {
+  0%, 100% { 
+    opacity: 0.6; 
+    transform: translateY(0) scale(1);
+  }
+  50% { 
+    opacity: 0.9; 
+    transform: translateY(-5px) scale(1.02);
+  }
+}
+
+/* ========================================
+   封底页 (Outro Slide)
+   ======================================== */
+.memoir-slide--outro {
+  position: relative;
+  overflow: hidden;
+}
+
+.memoir-slide__outro-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.memoir-slide__outro-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.7) saturate(0.85);
+}
+
+.memoir-slide__outro-texture {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.memoir-slide__outro-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(107, 142, 126, 0.4) 0%,
+    rgba(56, 56, 56, 0.5) 100%
+  );
+}
+
+.memoir-slide__outro-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: #fff;
+}
+
+.memoir-slide__outro-message {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 300;
+  font-family: var(--font-serif);
+  margin: 0 0 var(--spacing-xl) 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+  line-height: 2;
+}
+
+.memoir-slide__outro-end {
+  font-size: 0.875rem;
+  opacity: 0.6;
+  letter-spacing: 6px;
+  font-weight: 300;
+}
+
+/* ========================================
+   导航控件
+   ======================================== */
+.memoir-viewer__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: all var(--transition-normal);
+  backdrop-filter: blur(8px);
+}
+
+.memoir-viewer__nav:hover {
+  background-color: #fff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.memoir-viewer__nav:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.memoir-viewer__nav svg {
+  width: 20px;
+  height: 20px;
+}
+
+.memoir-viewer__nav--prev {
+  left: var(--spacing-lg);
+}
+
+.memoir-viewer__nav--next {
+  right: calc(var(--spacing-lg) + 60px); /* 给右侧进度指示器留空间 */
+}
+
+/* ========================================
+   底部进度条 (Progress Bar)
+   ======================================== */
+.memoir-viewer__progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.2);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.memoir-viewer__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), #06b6d4);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px var(--color-primary);
+}
+
+/* ========================================
+   右侧垂直进度指示器 (Vertical Progress)
+   旅行者路径风格
+   ======================================== */
+.memoir-viewer__progress-vertical {
+  position: absolute;
+  right: var(--spacing-lg);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+/* 路径连接线 */
+.memoir-viewer__progress-path {
+  position: absolute;
+  right: 4px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 1px;
+  z-index: 0;
+}
+
+.memoir-viewer__progress-path-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg, var(--color-primary) 0%, rgba(107, 142, 126, 0.6) 100%);
+  border-radius: 1px;
+  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 旅行者图标 */
+.memoir-viewer__traveler {
+  position: absolute;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  transform: translateY(-50%);
+  transition: top 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 5;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.memoir-viewer__traveler-icon {
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  animation: travelerWalk 0.8s ease-in-out infinite;
+}
+
+@keyframes travelerWalk {
+  0%, 100% { 
+    transform: translateY(0) rotate(-2deg); 
+  }
+  50% { 
+    transform: translateY(-2px) rotate(2deg); 
+  }
+}
+
+.memoir-viewer__progress-dot {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--transition-fast);
+  z-index: 1;
+}
+
+.memoir-viewer__progress-dot:hover {
+  border-color: rgba(255, 255, 255, 0.9);
+  transform: scale(1.2);
+}
+
+.memoir-viewer__progress-dot:hover .memoir-viewer__progress-dot-label {
+  opacity: 1;
+  transform: translateX(-8px);
+}
+
+.memoir-viewer__progress-dot--passed {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.memoir-viewer__progress-dot--active {
+  width: 12px;
+  height: 12px;
+  background-color: #fff;
+  border-color: #fff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+.memoir-viewer__progress-dot-label {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-12px);
+  font-size: 0.625rem;
+  color: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+  opacity: 0;
+  transition: all var(--transition-fast);
+  padding-right: 8px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  letter-spacing: 1px;
+}
+
+.memoir-viewer__progress-dot--active .memoir-viewer__progress-dot-label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-8px);
+}
+
+/* ========================================
+   页码文字
+   ======================================== */
+.memoir-viewer__page-number {
+  position: absolute;
+  bottom: var(--spacing-md);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+}
+
+
+/* ========================================
+   视差效果 (Parallax)
+   ======================================== */
+.memoir-slide__cover-bg,
+.memoir-slide__outro-bg {
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+
+.memoir-slide__cover-content,
+.memoir-slide__outro-content,
+.memoir-slide__chapter-visual,
+.memoir-slide__chapter-text {
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+
+/* ========================================
+   模板变体
+   ======================================== */
+
+/* Japanese Fresh */
+.memoir-viewer.template-japanese-fresh .memoir-slide__chapter-text {
+  background: linear-gradient(135deg, #fef7f0 0%, #fff5eb 100%);
+}
+
+.memoir-viewer.template-japanese-fresh .memoir-slide__chapter-stamp {
+  border-color: rgba(217, 119, 6, 0.3);
+  background: radial-gradient(circle, rgba(217, 119, 6, 0.1) 0%, transparent 70%);
+}
+
+.memoir-viewer.template-japanese-fresh .memoir-slide__personality-title {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Vintage Kraft */
+.memoir-viewer.template-vintage-kraft .memoir-slide__chapter-text,
+.memoir-viewer.template-vintage-kraft .memoir-slide__scroll-text,
+.memoir-viewer.template-vintage-kraft .memoir-slide__cinematic-text {
+  background: linear-gradient(135deg, #f5f0e6 0%, #ebe4d4 100%);
+}
+
+.memoir-viewer.template-vintage-kraft .memoir-slide__chapter-line {
+  color: #5c4a32;
+}
+
+.memoir-viewer.template-vintage-kraft .memoir-slide__personality-title {
+  background: linear-gradient(135deg, #8b7355 0%, #a08060 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Minimal Mono */
+.memoir-viewer.template-minimal-mono .memoir-slide__chapter-text,
+.memoir-viewer.template-minimal-mono .memoir-slide__scroll-text,
+.memoir-viewer.template-minimal-mono .memoir-slide__cinematic-text {
+  background-color: #fafafa;
+}
+
+.memoir-viewer.template-minimal-mono .memoir-slide__chapter-line {
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+}
+
+.memoir-viewer.template-minimal-mono .memoir-slide__personality-title {
+  background: linear-gradient(135deg, #424242 0%, #616161 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Ocean Breeze - 默认风格 */
+.memoir-viewer.template-ocean-breeze .memoir-slide__chapter-text,
+.memoir-viewer.template-ocean-breeze .memoir-slide__scroll-text,
+.memoir-viewer.template-ocean-breeze .memoir-slide__cinematic-text {
+  background: linear-gradient(135deg, #e0f4ff 0%, #f0faff 100%);
+}
+
+.memoir-viewer.template-ocean-breeze .memoir-slide__scroll-visual,
+.memoir-viewer.template-ocean-breeze .memoir-slide__cinematic-visual {
+  background: linear-gradient(135deg, #e8f8ff 0%, #f5fcff 100%);
+}
+
+.memoir-viewer.template-ocean-breeze .memoir-slide__chapter-stamp {
+  border-color: rgba(8, 145, 178, 0.3);
+  background: radial-gradient(circle, rgba(8, 145, 178, 0.1) 0%, transparent 70%);
+}
+
+.memoir-viewer.template-ocean-breeze .memoir-slide__personality-title {
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Forest Green */
+.memoir-viewer.template-forest-green .memoir-slide__chapter-text,
+.memoir-viewer.template-forest-green .memoir-slide__scroll-text,
+.memoir-viewer.template-forest-green .memoir-slide__cinematic-text {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f2 100%);
+}
+
+.memoir-viewer.template-forest-green .memoir-slide__scroll-visual,
+.memoir-viewer.template-forest-green .memoir-slide__cinematic-visual {
+  background: linear-gradient(135deg, #ecf7ed 0%, #f5faf5 100%);
+}
+
+.memoir-viewer.template-forest-green .memoir-slide__chapter-stamp {
+  border-color: rgba(46, 125, 50, 0.3);
+  background: radial-gradient(circle, rgba(46, 125, 50, 0.1) 0%, transparent 70%);
+}
+
+.memoir-viewer.template-forest-green .memoir-slide__personality-title {
+  background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Sunset Warm */
+.memoir-viewer.template-sunset-warm .memoir-slide__chapter-text,
+.memoir-viewer.template-sunset-warm .memoir-slide__scroll-text,
+.memoir-viewer.template-sunset-warm .memoir-slide__cinematic-text {
+  background: linear-gradient(135deg, #fff3e0 0%, #fff8f0 100%);
+}
+
+.memoir-viewer.template-sunset-warm .memoir-slide__scroll-visual,
+.memoir-viewer.template-sunset-warm .memoir-slide__cinematic-visual {
+  background: linear-gradient(135deg, #fff5e6 0%, #fffaf5 100%);
+}
+
+.memoir-viewer.template-sunset-warm .memoir-slide__chapter-stamp {
+  border-color: rgba(230, 81, 0, 0.3);
+  background: radial-gradient(circle, rgba(230, 81, 0, 0.1) 0%, transparent 70%);
+}
+
+.memoir-viewer.template-sunset-warm .memoir-slide__personality-title {
+  background: linear-gradient(135deg, #e65100 0%, #ff9800 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Lavender Dream */
+.memoir-viewer.template-lavender-dream .memoir-slide__chapter-text,
+.memoir-viewer.template-lavender-dream .memoir-slide__scroll-text,
+.memoir-viewer.template-lavender-dream .memoir-slide__cinematic-text {
+  background: linear-gradient(135deg, #f3e5f5 0%, #faf5fc 100%);
+}
+
+.memoir-viewer.template-lavender-dream .memoir-slide__scroll-visual,
+.memoir-viewer.template-lavender-dream .memoir-slide__cinematic-visual {
+  background: linear-gradient(135deg, #f7ecf9 0%, #fcf8fd 100%);
+}
+
+.memoir-viewer.template-lavender-dream .memoir-slide__chapter-stamp {
+  border-color: rgba(123, 31, 162, 0.3);
+  background: radial-gradient(circle, rgba(123, 31, 162, 0.1) 0%, transparent 70%);
+}
+
+.memoir-viewer.template-lavender-dream .memoir-slide__personality-title {
+  background: linear-gradient(135deg, #7b1fa2 0%, #9c27b0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Cherry Blossom */
+.memoir-viewer.template-cherry-blossom .memoir-slide__chapter-text,
+.memoir-viewer.template-cherry-blossom .memoir-slide__scroll-text,
+.memoir-viewer.template-cherry-blossom .memoir-slide__cinematic-text {
+  background: linear-gradient(135deg, #fce4ec 0%, #fdf2f5 100%);
+}
+
+.memoir-viewer.template-cherry-blossom .memoir-slide__scroll-visual,
+.memoir-viewer.template-cherry-blossom .memoir-slide__cinematic-visual {
+  background: linear-gradient(135deg, #fdeef2 0%, #fef7f9 100%);
+}
+
+.memoir-viewer.template-cherry-blossom .memoir-slide__chapter-stamp {
+  border-color: rgba(194, 24, 91, 0.3);
+  background: radial-gradient(circle, rgba(194, 24, 91, 0.1) 0%, transparent 70%);
+}
+
+.memoir-viewer.template-cherry-blossom .memoir-slide__personality-title {
+  background: linear-gradient(135deg, #c2185b 0%, #e91e63 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* ========================================
+   响应式设计
+   ======================================== */
+@media (max-width: 1024px) {
+  /* 封面调整 */
+  .memoir-slide__cover-content {
+    padding: var(--spacing-xl);
+    align-items: center;
+  }
+
+  .memoir-slide__cover-title--vertical {
+    writing-mode: horizontal-tb;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .memoir-slide__cover-title-main {
+    font-size: 2.5rem;
+  }
+
+  .memoir-slide__cover-title-sub {
+    font-size: 1.5rem;
+  }
+
+  .memoir-slide__cover-meta {
+    right: 50%;
+    transform: translateX(50%);
+    align-items: center;
+  }
+
+  /* 章节页调整 - 挂轴布局 */
+  .memoir-slide--chapter-scroll {
+    grid-template-columns: 1fr;
+    grid-template-rows: 50% 50%;
+  }
+
+  .memoir-slide__scroll-visual {
+    padding: var(--spacing-md);
+  }
+
+  .memoir-slide__scroll-text {
+    padding: var(--spacing-lg);
+  }
+
+  /* 竖版照片在平板上的调整 */
+  .memoir-slide__mounted-frame--portrait {
+    width: 320px;
+    height: 440px;
+  }
+
+  .memoir-slide__mounted-frame--landscape {
+    width: 440px;
+    height: 300px;
+  }
+
+  .memoir-slide__mounted-frame--square {
+    width: 360px;
+    height: 360px;
+  }
+
+  .memoir-slide__seal--scroll-external {
+    bottom: 40px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+  }
+
+  /* 章节页调整 - 电影布局 */
+  .memoir-slide--chapter-cinematic {
+    flex-direction: column;
+  }
+
+  .memoir-slide__cinematic-visual {
+    height: 50%;
+  }
+
+  .memoir-slide__cinematic-text {
+    height: 50%;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+
+  .memoir-slide__cinematic-poetry {
+    column-count: 1;
+  }
+
+  .memoir-slide__chapter-time {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-md);
+  }
+
+  /* 人格页调整 */
+  .memoir-slide__personality-tag {
+    font-size: 0.75rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  /* 导航调整 */
+  .memoir-viewer__nav {
+    width: 40px;
+    height: 40px;
+  }
+
+  .memoir-viewer__nav svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .memoir-viewer__nav--prev {
+    left: var(--spacing-sm);
+  }
+
+  .memoir-viewer__nav--next {
+    right: calc(var(--spacing-sm) + 50px);
+  }
+
+  /* 进度指示器调整 */
+  .memoir-viewer__progress-vertical {
+    right: var(--spacing-sm);
+    gap: 10px;
+  }
+
+  .memoir-viewer__progress-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .memoir-viewer__progress-dot--active {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* 封面调整 */
+  .memoir-slide__cover-title-main {
+    font-size: 2rem;
+  }
+
+  .memoir-slide__cover-title-sub {
+    font-size: 1.25rem;
+  }
+
+  .memoir-slide__cover-hint {
+    bottom: var(--spacing-lg);
+  }
+
+  /* 章节页调整 */
+  .memoir-slide--chapter {
+    grid-template-rows: 45% 55%;
+  }
+
+  .memoir-slide__chapter-photos {
+    padding: var(--spacing-md);
+  }
+
+  .memoir-slide__chapter-photo-frame {
+    padding: 4px;
+  }
+
+  .memoir-slide__chapter-text {
+    padding: var(--spacing-md);
+  }
+
+  .memoir-slide__chapter-index-area {
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .memoir-slide__chapter-time {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .memoir-slide__chapter-line {
+    font-size: 0.9375rem;
+    line-height: 1.8;
+  }
+
+  .memoir-slide__chapter-stamp {
+    width: 44px;
+    height: 44px;
+    bottom: var(--spacing-md);
+    right: var(--spacing-md);
+  }
+
+  .memoir-slide__chapter-stamp-emoji {
+    font-size: 1.25rem;
+  }
+
+  /* 竖版照片在手机上的调整 */
+  .memoir-slide__mounted-frame--portrait {
+    width: 280px;
+    height: 380px;
+  }
+
+  .memoir-slide__mounted-frame--landscape {
+    width: 360px;
+    height: 250px;
+  }
+
+  .memoir-slide__mounted-frame--square {
+    width: 300px;
+    height: 300px;
+  }
+
+  .memoir-slide__seal--scroll-external {
+    bottom: 30px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+  }
+
+  /* 人格页调整 */
+  .memoir-slide__personality-card {
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md);
+    max-width: calc(100% - var(--spacing-xl));
+  }
+
+  .memoir-slide__personality-title {
+    font-size: 1.5rem;
+  }
+
+  .memoir-slide__personality-stat-value {
+    font-size: 2rem;
+  }
+
+  .memoir-slide__personality-constellation {
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+
+  .memoir-slide__personality-stat-line {
+    display: none;
+  }
+
+  .memoir-slide__personality-tag {
+    display: none;
+  }
+
+  /* 导航调整 */
+  .memoir-viewer__nav {
+    width: 36px;
+    height: 36px;
+  }
+
+  .memoir-viewer__nav svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .memoir-viewer__nav--next {
+    right: calc(var(--spacing-sm) + 40px);
+  }
+
+  /* 进度指示器调整 */
+  .memoir-viewer__progress-vertical {
+    gap: 8px;
+  }
+
+  .memoir-viewer__progress-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .memoir-viewer__progress-dot--active {
+    width: 8px;
+    height: 8px;
+  }
+
+  .memoir-viewer__progress-dot-label {
+    display: none;
+  }
+
+  .memoir-viewer__progress-bar {
+    height: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 封面调整 */
+  .memoir-slide__cover-title-main {
+    font-size: 1.75rem;
+  }
+
+  .memoir-slide__cover-title-sub {
+    font-size: 1rem;
+  }
+
+  .memoir-slide__cover-hint {
+    display: none;
+  }
+
+  /* 章节页调整 */
+  .memoir-slide--chapter {
+    grid-template-rows: 40% 60%;
+  }
+
+  .memoir-slide__chapter-photo-duo {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .memoir-slide__chapter-photo-duo .memoir-slide__chapter-photo-frame {
+    width: 70%;
+    aspect-ratio: 4 / 3;
+  }
+
+  .memoir-slide__chapter-photo-collage {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+
+  .memoir-slide__chapter-photo-stack {
+    display: none;
+  }
+
+  .memoir-slide__chapter-text {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .memoir-slide__chapter-line {
+    font-size: 0.875rem;
+  }
+
+  .memoir-slide__chapter-poetry {
+    gap: var(--spacing-sm);
+  }
+
+  /* 竖版照片在小屏幕上的调整 */
+  .memoir-slide__mounted-frame--portrait {
+    width: 220px;
+    height: 300px;
+  }
+
+  .memoir-slide__mounted-frame--landscape {
+    width: 280px;
+    height: 200px;
+  }
+
+  .memoir-slide__mounted-frame--square {
+    width: 240px;
+    height: 240px;
+  }
+
+  .memoir-slide__seal--scroll-external {
+    bottom: 20px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .memoir-slide__seal--scroll-external .memoir-slide__seal-char {
+    font-size: 1rem;
+  }
+
+  /* 人格页调整 */
+  .memoir-slide__personality-card {
+    padding: var(--spacing-md);
+  }
+
+  .memoir-slide__personality-title {
+    font-size: 1.25rem;
+  }
+
+  .memoir-slide__personality-desc {
+    font-size: 0.875rem;
+  }
+
+  .memoir-slide__personality-stat-value {
+    font-size: 1.75rem;
+  }
+
+  /* 进度指示器 - 移动端简化 */
+  .memoir-viewer__progress-vertical {
+    display: none;
+  }
+
+  .memoir-viewer__nav--next {
+    right: var(--spacing-sm);
+  }
+
+  .memoir-viewer__page-number {
+    bottom: var(--spacing-sm);
+  }
+}

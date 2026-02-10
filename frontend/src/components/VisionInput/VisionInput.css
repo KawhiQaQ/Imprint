@@ -1,0 +1,198 @@
+/* ========================================
+   VisionInput - 苔原静谧 (Moss & Mist)
+   信纸风格 · 优化填充
+   ======================================== */
+
+.vision-input-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ========================================
+   输入框 - 信纸风格
+   ======================================== */
+
+.vision-input-wrapper {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 140px;
+}
+
+.vision-textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 140px;
+  padding: var(--spacing-md) var(--spacing-sm);
+  padding-bottom: var(--spacing-xl);
+  font-size: 1.125rem;
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', 'SimSun', serif;
+  font-weight: 400;
+  line-height: 2;
+  letter-spacing: 0.03em;
+  color: var(--color-text);
+  background-color: transparent;
+  border: none;
+  resize: none;
+  transition: all var(--transition-normal);
+}
+
+.vision-textarea:focus {
+  outline: none;
+}
+
+.vision-textarea::placeholder {
+  color: var(--color-text-light);
+  opacity: 0.6;
+  font-style: normal;
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', serif;
+  font-weight: 300;
+}
+
+.vision-textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.vision-textarea.has-error + .vision-textarea-line {
+  background-color: var(--color-error);
+}
+
+/* 底部装饰线 */
+.vision-textarea-line {
+  position: absolute;
+  bottom: var(--spacing-md);
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-accent) 10%,
+    var(--color-accent) 90%,
+    transparent 100%
+  );
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* 字数统计 */
+.vision-char-count {
+  position: absolute;
+  bottom: 2px;
+  right: var(--spacing-sm);
+  font-size: 0.6875rem;
+  color: var(--color-text-light);
+  opacity: 0.4;
+}
+
+.vision-char-count.near-limit {
+  color: var(--color-warning);
+  opacity: 1;
+}
+
+.vision-char-count.at-limit {
+  color: var(--color-error);
+  opacity: 1;
+}
+
+/* 错误提示 */
+.vision-error {
+  margin-top: var(--spacing-sm);
+  font-size: 0.8125rem;
+  color: var(--color-error);
+  text-align: center;
+}
+
+/* ========================================
+   鹅卵石灵感标签
+   ======================================== */
+
+.vision-pebbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  padding: var(--spacing-sm) 0 var(--spacing-md);
+}
+
+.vision-pebble {
+  padding: 7px 16px;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  color: var(--color-primary);
+  background-color: rgba(140, 158, 137, 0.1);
+  border: none;
+  border-radius: 18px 22px 20px 16px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.vision-pebble:nth-child(2) {
+  border-radius: 20px 16px 22px 18px;
+}
+
+.vision-pebble:nth-child(3) {
+  border-radius: 16px 20px 18px 22px;
+}
+
+.vision-pebble:nth-child(4) {
+  border-radius: 22px 18px 16px 20px;
+}
+
+.vision-pebble:nth-child(5) {
+  border-radius: 18px 20px 22px 16px;
+}
+
+.vision-pebble:hover:not(:disabled) {
+  background-color: var(--color-accent);
+  color: #fff;
+  transform: scale(1.05) rotate(0deg) !important;
+}
+
+.vision-pebble:active:not(:disabled) {
+  transform: scale(0.98) rotate(0deg) !important;
+}
+
+.vision-pebble:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* ========================================
+   提交按钮
+   ======================================== */
+
+.vision-submit-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--spacing-sm);
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 640px) {
+  .vision-input-wrapper {
+    min-height: 120px;
+  }
+
+  .vision-textarea {
+    min-height: 120px;
+    font-size: 1rem;
+    line-height: 1.9;
+    letter-spacing: 0.02em;
+  }
+
+  .vision-pebble {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+
+  .vision-pebbles {
+    gap: 8px;
+  }
+}

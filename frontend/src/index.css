@@ -1,0 +1,186 @@
+/* ========================================
+   苔原静谧 (Moss & Mist) Theme
+   Japanese Minimalism Design System
+   ======================================== */
+
+:root {
+  /* 核心配色 - 日式极简绿色系 */
+  --color-canvas: #F5F5F3;           /* 生成色 Kinari - 宣纸/棉麻质感 */
+  --color-primary: #5D7260;          /* 利休茶 Rikyu-cha - 主色调 */
+  --color-primary-hover: #4A5C4D;    /* 主色调悬停 */
+  --color-accent: #8C9E89;           /* 柳染 Yanagi-zome - 强调色 */
+  --color-accent-light: #A8B8A5;     /* 浅强调色 */
+  --color-text: #383838;             /* 墨色 Sumi - 文字色 */
+  --color-text-muted: #6B6B6B;       /* 次级文字 */
+  --color-text-light: #8A8A8A;       /* 辅助文字 */
+  --color-highlight: #C45C48;        /* 铅丹色 - 点缀色 */
+  
+  /* 背景层次 */
+  --color-bg: var(--color-canvas);
+  --color-bg-elevated: #FAFAF8;      /* 略微提升的背景 */
+  --color-bg-card: #FFFFFF;
+  --color-bg-hover: rgba(93, 114, 96, 0.06);
+  --color-bg-active: rgba(93, 114, 96, 0.12);
+  
+  /* 边框 */
+  --color-border: #E0E0DC;
+  --color-border-light: #EAEAE6;
+  --color-border-focus: var(--color-primary);
+  
+  /* 状态色 */
+  --color-error: #B54A3C;
+  --color-error-light: rgba(181, 74, 60, 0.1);
+  --color-success: #5D7260;
+  --color-warning: #B8956B;
+  
+  /* 间距 - 基于8px网格 */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  --spacing-3xl: 4rem;     /* 64px */
+  
+  /* 圆角 - 柔和但不过度 */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  
+  /* 阴影 - 极淡，营造纸张层叠感 */
+  --shadow-sm: 0 1px 3px rgba(56, 56, 56, 0.04);
+  --shadow-md: 0 4px 12px rgba(56, 56, 56, 0.06);
+  --shadow-lg: 0 8px 24px rgba(56, 56, 56, 0.08);
+  --shadow-xl: 0 16px 48px rgba(56, 56, 56, 0.1);
+  
+  /* 字体 */
+  --font-sans: "Noto Sans SC", "Hiragino Sans GB", "Microsoft YaHei", 
+               -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: "Noto Serif SC", "Source Han Serif SC", "SimSun", serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  
+  /* 过渡 */
+  --transition-fast: 120ms ease-out;
+  --transition-normal: 200ms ease-out;
+  --transition-slow: 320ms ease-out;
+  --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ========================================
+   Reset & Base
+   ======================================== */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* 隐藏滚动条但保留滚动功能 */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100vw;
+}
+
+.app {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========================================
+   Typography
+   ======================================== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.125rem; }
+
+p {
+  line-height: 1.7;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* ========================================
+   Focus States - 无障碍
+   ======================================== */
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   Utility Classes
+   ======================================== */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.text-center { text-align: center; }
+.text-muted { color: var(--color-text-muted); }
+.text-light { color: var(--color-text-light); }
+
+/* ========================================
+   Responsive
+   ======================================== */
+
+@media (max-width: 640px) {
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.125rem; }
+}

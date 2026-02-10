@@ -1,0 +1,74 @@
+/* ========================================
+   Loading - 苔原静谧 (Moss & Mist) Theme
+   ======================================== */
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl);
+}
+
+.loading-fullscreen {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(245, 245, 243, 0.95);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+}
+
+.loading-spinner {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.loading-circle {
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  animation: loading-bounce 1.4s ease-in-out infinite both;
+}
+
+.loading-circle:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loading-circle:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+/* Sizes */
+.loading-sm .loading-circle {
+  width: 6px;
+  height: 6px;
+}
+
+.loading-md .loading-circle {
+  width: 8px;
+  height: 8px;
+}
+
+.loading-lg .loading-circle {
+  width: 10px;
+  height: 10px;
+}
+
+.loading-text {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+@keyframes loading-bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

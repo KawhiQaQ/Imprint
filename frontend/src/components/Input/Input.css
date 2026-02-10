@@ -1,0 +1,68 @@
+/* ========================================
+   Input - 苔原静谧 (Moss & Mist) Theme
+   ======================================== */
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.input-full {
+  width: 100%;
+}
+
+.input-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.input-field {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text);
+  transition: all var(--transition-fast);
+}
+
+.input-field:hover {
+  border-color: var(--color-accent);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(93, 114, 96, 0.1);
+}
+
+.input-field::placeholder {
+  color: var(--color-text-light);
+}
+
+.input-field:disabled {
+  background-color: var(--color-bg);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.input-error .input-field {
+  border-color: var(--color-error);
+}
+
+.input-error .input-field:focus {
+  box-shadow: 0 0 0 3px var(--color-error-light);
+}
+
+.input-error-text {
+  font-size: 0.75rem;
+  color: var(--color-error);
+}
+
+.input-helper-text {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+}

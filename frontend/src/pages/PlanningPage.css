@@ -1,0 +1,302 @@
+/* ========================================
+   PlanningPage - 苔原静谧 (Moss & Mist) Theme
+   左静右动的非对称全屏布局
+   左侧 25% - The Companion (AI 助手)
+   右侧 75% - The Path (行程可视化)
+   ======================================== */
+
+.planning-page {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #F5F5F3;
+}
+
+/* ========================================
+   左侧面板 - The Companion (AI 助手区域)
+   随身手账风格，静态工具栏
+   ======================================== */
+.planning-page__sidebar {
+  width: 25%;
+  min-width: 320px;
+  max-width: 400px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #F5F5F3;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  /* 纸质纹理效果 */
+  background-image: 
+    linear-gradient(90deg, rgba(0,0,0,0.008) 1px, transparent 1px),
+    linear-gradient(rgba(0,0,0,0.008) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 左侧头部区域 */
+.planning-page__sidebar-header {
+  padding: var(--spacing-lg) var(--spacing-lg) 0;
+  flex-shrink: 0;
+}
+
+.planning-page__back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+  text-decoration: none;
+  opacity: 0.7;
+  margin-bottom: var(--spacing-sm);
+}
+
+.planning-page__back-link:hover {
+  color: var(--color-primary);
+  opacity: 1;
+  text-decoration: none;
+}
+
+.planning-page__sidebar-title {
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', serif;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #383838;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.planning-page__sidebar-subtitle {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: var(--spacing-xs) 0 0 0;
+  line-height: 1.5;
+}
+
+/* 聊天面板容器 - 悬浮卡片效果 */
+.planning-page__chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ========================================
+   右侧面板 - The Path (行程可视化区域)
+   动态时间流
+   ======================================== */
+.planning-page__main {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #FAFAF8;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 右侧头部区域 */
+.planning-page__main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: transparent;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.planning-page__destination-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.planning-page__destination-marker {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+}
+
+.planning-page__destination-name {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #383838;
+  margin: 0;
+}
+
+.planning-page__trip-duration {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.planning-page__start-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.planning-page__start-btn:hover:not(:disabled) {
+  background-color: #4a5c4d;
+  box-shadow: 0 4px 16px rgba(93, 114, 96, 0.25);
+}
+
+.planning-page__start-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 行程内容区域 */
+.planning-page__itinerary-container {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ========================================
+   隐藏旧的 header 和 content 结构
+   ======================================== */
+.planning-page__header {
+  display: none;
+}
+
+.planning-page__content {
+  display: contents;
+}
+
+.planning-page__header-left,
+.planning-page__header-right,
+.planning-page__title {
+  display: none;
+}
+
+/* Loading State */
+.planning-page__loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  height: 100vh;
+  background: #F5F5F3;
+}
+
+.planning-page__loading-text {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  font-family: 'Noto Serif SC', serif;
+}
+
+/* Error State */
+.planning-page__error {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-2xl);
+  width: 100%;
+  height: 100vh;
+  background: #F5F5F3;
+}
+
+.planning-page__error-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.6;
+}
+
+.planning-page__error-message {
+  font-size: 1rem;
+  color: var(--color-error);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ========================================
+   响应式设计
+   ======================================== */
+
+/* 大屏幕 */
+@media (min-width: 1400px) {
+  .planning-page__sidebar {
+    max-width: 420px;
+  }
+}
+
+/* 中等屏幕 */
+@media (max-width: 1200px) {
+  .planning-page__sidebar {
+    width: 30%;
+    min-width: 300px;
+  }
+}
+
+/* 平板 */
+@media (max-width: 900px) {
+  .planning-page {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .planning-page__sidebar {
+    width: 100%;
+    max-width: none;
+    min-width: auto;
+    height: auto;
+    min-height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    order: 2;
+  }
+  
+  .planning-page__main {
+    height: auto;
+    min-height: 50vh;
+    order: 1;
+  }
+  
+  .planning-page__main-header {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+
+/* 手机 */
+@media (max-width: 640px) {
+  .planning-page__sidebar-header {
+    padding: var(--spacing-md);
+  }
+  
+  .planning-page__sidebar-title {
+    font-size: 1rem;
+  }
+  
+  .planning-page__main-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .planning-page__start-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

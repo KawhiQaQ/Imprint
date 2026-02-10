@@ -1,0 +1,586 @@
+/* ========================================
+   ItineraryBoard - 飞石行程 (Tobi-ishi Path)
+   枯山水风格的踏脚石卡片布局
+   支持收纳/展开交互
+   ======================================== */
+
+.itinerary-board {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: transparent;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ========================================
+   A. 顶部导航：时间轴 Day Tabs
+   ======================================== */
+.itinerary-board__nav {
+  flex-shrink: 0;
+  padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-md);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.itinerary-board__day-tabs {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.itinerary-board__day-tab {
+  padding: 8px 16px;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background-color: transparent;
+  color: #666;
+}
+
+.itinerary-board__day-tab:hover {
+  background-color: rgba(93, 114, 96, 0.08);
+  color: #383838;
+}
+
+.itinerary-board__day-tab--active {
+  background-color: #5D7260;
+  color: #fff;
+}
+
+.itinerary-board__day-tab--active:hover {
+  background-color: #4a5c4d;
+  color: #fff;
+}
+
+.itinerary-board__day-summary {
+  margin-top: var(--spacing-sm);
+  font-size: 0.6875rem;
+  color: var(--color-text-light);
+  letter-spacing: 0.05em;
+}
+
+/* ========================================
+   B. 核心内容区
+   ======================================== */
+.itinerary-board__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.itinerary-board__content::-webkit-scrollbar {
+  display: none;
+}
+
+.itinerary-board__stones {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ========================================
+   连接器
+   ======================================== */
+.itinerary-board__connector {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-xs) 0;
+  margin-left: calc(15% + 20px);
+}
+
+.itinerary-board__connector-line {
+  width: 1px;
+  height: 20px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #ddd 0px,
+    #ddd 3px,
+    transparent 3px,
+    transparent 6px
+  );
+  margin-right: var(--spacing-md);
+}
+
+.itinerary-board__connector-transport {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  background-color: rgba(0, 0, 0, 0.03);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.itinerary-board__connector-icon {
+  font-size: 0.875rem;
+}
+
+.itinerary-board__connector-text {
+  font-weight: 500;
+}
+
+/* ========================================
+   踏脚石节点 (Stone)
+   ======================================== */
+.itinerary-board__stone {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xs) 0;
+}
+
+/* 左列：时间锚点 */
+.itinerary-board__stone-time {
+  width: 15%;
+  min-width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-top: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.itinerary-board__stone-time-main {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #8C9E89;
+  font-family: 'SF Mono', 'Monaco', monospace;
+  letter-spacing: -0.02em;
+}
+
+.itinerary-board__stone-time-duration {
+  font-size: 0.6875rem;
+  color: #aaa;
+  margin-top: 2px;
+}
+
+/* 中列：时间线 */
+.itinerary-board__stone-timeline {
+  width: 5%;
+  min-width: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.itinerary-board__stone-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #5D7260;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform var(--transition-fast);
+}
+
+.itinerary-board__stone:hover .itinerary-board__stone-dot {
+  transform: scale(1.1);
+}
+
+.itinerary-board__stone-dot-icon {
+  font-size: 0.875rem;
+  filter: grayscale(0.2);
+}
+
+/* ========================================
+   右列：事件卡片 - 收纳/展开设计
+   ======================================== */
+.itinerary-board__stone-card {
+  flex: 1;
+  background-color: #fff;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 3px solid #5D7260;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  position: relative;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.itinerary-board__stone-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.itinerary-board__stone-card--expanded {
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+/* 收纳状态：核心信息行 */
+.itinerary-board__stone-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.itinerary-board__stone-main {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+.itinerary-board__stone-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.itinerary-board__stone-name-text {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #383838;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itinerary-board__stone-key-tag {
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: #B8956B;
+  background-color: rgba(184, 149, 107, 0.12);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.itinerary-board__stone-expand-icon {
+  font-size: 0.625rem;
+  color: #aaa;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.itinerary-board__stone-expand-icon--expanded {
+  transform: rotate(180deg);
+}
+
+/* ========================================
+   展开状态：详细信息 - Slide Down 动画
+   ======================================== */
+.itinerary-board__stone-details {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 0;
+}
+
+.itinerary-board__stone-details--visible {
+  max-height: 400px;
+  opacity: 1;
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* 卡片头部 */
+.itinerary-board__stone-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+}
+
+.itinerary-board__stone-type {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.itinerary-board__stone-verified {
+  font-size: 0.625rem;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+/* 地点名称 */
+.itinerary-board__stone-name {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+  cursor: text;
+  padding: 2px 4px;
+  margin-left: -4px;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.itinerary-board__stone-name:hover {
+  background-color: rgba(93, 114, 96, 0.08);
+}
+
+.itinerary-board__stone-starting {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+/* 标签 */
+.itinerary-board__stone-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.itinerary-board__stone-tag {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.itinerary-board__stone-tag--price {
+  color: #B8956B;
+  background-color: rgba(184, 149, 107, 0.12);
+}
+
+.itinerary-board__stone-tag--ticket {
+  color: #7C9CB5;
+  background-color: rgba(124, 156, 181, 0.12);
+}
+
+/* AI 推荐语 */
+.itinerary-board__stone-desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  margin: 0 0 var(--spacing-sm) 0;
+  cursor: text;
+  padding: 2px 4px;
+  margin-left: -4px;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.itinerary-board__stone-desc:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* 小贴士 */
+.itinerary-board__stone-tips {
+  font-size: 0.75rem;
+  color: var(--color-primary);
+  background-color: rgba(93, 114, 96, 0.06);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.5;
+}
+
+/* 操作按钮 */
+.itinerary-board__stone-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.itinerary-board__stone-action {
+  font-size: 0.75rem;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background-color: rgba(0, 0, 0, 0.04);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.itinerary-board__stone-action:hover {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+/* ========================================
+   编辑输入框
+   ======================================== */
+.itinerary-board__edit-input,
+.itinerary-board__edit-textarea {
+  width: 100%;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background-color: #FAFAF8;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  outline: none;
+}
+
+.itinerary-board__edit-textarea {
+  resize: vertical;
+  min-height: 48px;
+}
+
+/* ========================================
+   空状态
+   ======================================== */
+.itinerary-board--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.itinerary-board__empty-state {
+  text-align: center;
+  padding: var(--spacing-2xl);
+}
+
+.itinerary-board__empty-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.itinerary-board__empty-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.itinerary-board__empty-text {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.itinerary-board__empty-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  border: 2px dashed rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-light);
+  font-size: 0.875rem;
+}
+
+/* ========================================
+   加载状态
+   ======================================== */
+.itinerary-board__loading {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(250, 250, 248, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  z-index: 10;
+}
+
+.itinerary-board__loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(93, 114, 96, 0.2);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   响应式设计
+   ======================================== */
+@media (max-width: 1200px) {
+  .itinerary-board__stone-time {
+    width: 12%;
+    min-width: 50px;
+  }
+  
+  .itinerary-board__stone-time-main {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .itinerary-board__nav {
+    padding: var(--spacing-md);
+  }
+  
+  .itinerary-board__content {
+    padding: var(--spacing-md);
+  }
+  
+  .itinerary-board__stone {
+    gap: var(--spacing-sm);
+  }
+  
+  .itinerary-board__stone-time {
+    width: 15%;
+  }
+  
+  .itinerary-board__stone-time-main {
+    font-size: 0.9375rem;
+  }
+  
+  .itinerary-board__stone-card {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+
+@media (max-width: 640px) {
+  .itinerary-board__day-tab {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+  
+  .itinerary-board__stone-time {
+    display: none;
+  }
+  
+  .itinerary-board__stone-timeline {
+    width: auto;
+    min-width: 24px;
+  }
+  
+  .itinerary-board__stone-dot {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .itinerary-board__stone-dot-icon {
+    font-size: 0.75rem;
+  }
+  
+  .itinerary-board__connector {
+    margin-left: 32px;
+  }
+  
+  .itinerary-board__stone-name-text {
+    font-size: 0.875rem;
+  }
+  
+  .itinerary-board__stone-actions {
+    flex-direction: column;
+  }
+  
+  .itinerary-board__stone-action {
+    width: 100%;
+    text-align: center;
+  }
+}

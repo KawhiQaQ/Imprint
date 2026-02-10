@@ -1,0 +1,207 @@
+/* ========================================
+   CitySearch - 苔原静谧 (Moss & Mist)
+   Pill Shape 极简搜索框
+   ======================================== */
+
+.city-search {
+  position: relative;
+  width: 100%;
+}
+
+.city-search__input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Pill Shape 搜索框 */
+.city-search__input {
+  width: 100%;
+  padding: 14px var(--spacing-xl) 14px var(--spacing-lg);
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  /* Pill shape - 大圆角 */
+  border-radius: 100px;
+  transition: all var(--transition-normal);
+  outline: none;
+}
+
+.city-search__input:hover {
+  border-color: var(--color-accent);
+}
+
+.city-search__input:focus {
+  border-color: var(--color-primary);
+  background-color: #fff;
+}
+
+.city-search__input:disabled {
+  background-color: var(--color-bg);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.city-search__input::placeholder {
+  color: var(--color-text-light);
+  opacity: 0.6;
+}
+
+/* 搜索图标 - 放右侧 */
+.city-search__icon {
+  position: absolute;
+  right: var(--spacing-lg);
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+  pointer-events: none;
+  transition: color var(--transition-fast);
+}
+
+.city-search__input:focus ~ .city-search__icon {
+  color: var(--color-primary);
+}
+
+/* 加载动画 */
+.city-search__spinner {
+  position: absolute;
+  right: var(--spacing-lg);
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: citySearchSpin 0.7s linear infinite;
+}
+
+@keyframes citySearchSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 错误提示 */
+.city-search__error {
+  margin-top: var(--spacing-sm);
+  font-size: 0.8125rem;
+  color: var(--color-error);
+  text-align: center;
+}
+
+/* ========================================
+   下拉列表
+   ======================================== */
+
+.city-search__dropdown {
+  position: absolute;
+  top: calc(100% + var(--spacing-sm));
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 8px 32px rgba(56, 56, 56, 0.1);
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+/* 隐藏滚动条 */
+.city-search__dropdown::-webkit-scrollbar {
+  width: 0;
+}
+
+/* 列表项 */
+.city-search__item {
+  padding: var(--spacing-md) var(--spacing-lg);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.city-search__item:first-child {
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.city-search__item:last-child {
+  border-bottom: none;
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+.city-search__item:only-child {
+  border-radius: var(--radius-xl);
+}
+
+.city-search__item:hover,
+.city-search__item--selected {
+  background: var(--color-bg-hover);
+}
+
+.city-search__item-main {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: 4px;
+}
+
+.city-search__item-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.city-search__item-province {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.city-search__item-desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-light);
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+
+@media (max-width: 640px) {
+  .city-search__input {
+    padding: 12px var(--spacing-lg) 12px var(--spacing-md);
+    font-size: 0.9375rem;
+  }
+
+  .city-search__icon {
+    right: var(--spacing-md);
+  }
+
+  .city-search__dropdown {
+    max-height: 220px;
+    border-radius: var(--radius-lg);
+  }
+
+  .city-search__item {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .city-search__item:first-child {
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .city-search__item:last-child {
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  }
+
+  .city-search__item:only-child {
+    border-radius: var(--radius-lg);
+  }
+}

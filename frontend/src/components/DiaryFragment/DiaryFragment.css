@@ -1,0 +1,1257 @@
+/* ========================================
+   DiaryFragment - 自适应布局
+   横版照片：电影画幅式 (Cinematic)
+   竖版照片：杂志页布局 (Magazine)
+   ======================================== */
+
+.diary-fragment {
+  position: relative;
+  background: #FFFEF8;
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.diary-fragment::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #C9A227 0%, #E8C547 50%, #C9A227 100%);
+  opacity: 0.7;
+  z-index: 1;
+}
+
+/* ========================================
+   通用组件
+   ======================================== */
+
+/* 天气心情标签 - 日式极简风格 */
+.diary-fragment__seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(4px);
+}
+
+.diary-fragment__seal--weather {
+  background: linear-gradient(135deg, rgba(224, 242, 254, 0.9) 0%, rgba(186, 230, 253, 0.9) 100%);
+  color: #0369A1;
+  border: 1px solid rgba(3, 105, 161, 0.2);
+}
+
+.diary-fragment__seal--mood {
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.9) 0%, rgba(253, 230, 138, 0.9) 100%);
+  color: #92400E;
+  border: 1px solid rgba(146, 64, 14, 0.2);
+}
+
+.diary-fragment__seal--on-photo {
+  position: absolute;
+  bottom: 12px;
+  left: 8px;
+  z-index: 2;
+}
+
+.diary-fragment__seal--on-photo-right {
+  position: absolute;
+  top: 12px;
+  right: 8px;
+  z-index: 2;
+}
+
+/* 印章区 - 竖版布局 */
+.diary-fragment__stamps {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.diary-fragment__stamp {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+}
+
+.diary-fragment__stamp--weather {
+  background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%);
+  color: #0369A1;
+}
+
+.diary-fragment__stamp--mood {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  color: #92400E;
+}
+
+.diary-fragment__stamp-emoji {
+  font-size: 0.85rem;
+}
+
+.diary-fragment__stamp-label {
+  font-weight: 500;
+}
+
+/* 地理位置 */
+.diary-fragment__location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: #A8A4A0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  margin-top: var(--spacing-sm);
+}
+
+.diary-fragment__location:hover {
+  color: #5D7260;
+}
+
+.diary-fragment__location-icon {
+  font-size: 0.8rem;
+}
+
+/* 快捷操作 */
+.diary-fragment__quick-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-top: auto;
+  padding-top: var(--spacing-sm);
+}
+
+.diary-fragment__action-btn {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #8B8580;
+  background: transparent;
+  border: 1px solid rgba(93, 114, 96, 0.2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.diary-fragment__action-btn:hover {
+  color: #5D7260;
+  border-color: #5D7260;
+  background-color: rgba(93, 114, 96, 0.05);
+}
+
+/* 润色按钮 */
+.diary-fragment__regenerate-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(201, 162, 39, 0.1);
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.diary-fragment__regenerate-btn:hover {
+  background: rgba(201, 162, 39, 0.2);
+  border-color: #C9A227;
+  transform: scale(1.05);
+}
+
+/* Status Badges */
+.diary-fragment__status-badge {
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.diary-fragment__status-badge--changed {
+  background-color: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+}
+
+.diary-fragment__status-badge--unrealized {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+}
+
+/* 编辑区 */
+.diary-fragment__edit-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.diary-fragment__textarea {
+  flex: 1;
+  width: 100%;
+  padding: var(--spacing-sm);
+  font-family: 'Noto Serif SC', Georgia, serif;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: #383838;
+  background-color: #FAF9F6;
+  border: 1px solid rgba(201, 162, 39, 0.2);
+  border-radius: var(--radius-sm);
+  resize: none;
+  min-height: 100px;
+}
+
+.diary-fragment__textarea:focus {
+  outline: none;
+  border-color: #C9A227;
+}
+
+.diary-fragment__edit-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--spacing-xs);
+}
+
+.diary-fragment__char-count {
+  font-size: 0.7rem;
+  color: #A8A4A0;
+}
+
+.diary-fragment__edit-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+/* 心情选择器 */
+.diary-fragment__mood-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: var(--spacing-sm);
+  background-color: #FFFEF8;
+  border: 1px solid rgba(201, 162, 39, 0.2);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.diary-fragment__mood-option {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.diary-fragment__mood-option:hover {
+  background-color: rgba(201, 162, 39, 0.1);
+  transform: scale(1.1);
+}
+
+.diary-fragment__mood-option--selected {
+  border-color: #C9A227;
+  background-color: rgba(201, 162, 39, 0.15);
+}
+
+/* Footer */
+.diary-fragment__footer {
+  padding-top: var(--spacing-xs);
+}
+
+.diary-fragment__edited-badge {
+  font-size: 0.6rem;
+  padding: 2px 8px;
+  background-color: rgba(201, 162, 39, 0.1);
+  color: #8B6914;
+  border-radius: var(--radius-full);
+}
+
+
+/* ========================================
+   杂志页布局 (Magazine) - 竖版照片
+   ======================================== */
+.diary-fragment--magazine {
+  flex-direction: column;
+}
+
+.diary-fragment__spread {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* 左半区 (40%) - 视觉与印记 */
+.diary-fragment__left-panel {
+  width: 38%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-lg);
+  background: linear-gradient(180deg, #F8F7F4 0%, #F5F4F1 100%);
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 拍立得区域 */
+.diary-fragment__polaroid-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+/* 拍立得风格照片 */
+.diary-fragment__polaroid {
+  position: relative;
+  background: white;
+  padding: 8px 8px 28px 8px;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: rotate(-2deg);
+  max-width: 90%;
+  transition: transform 0.3s ease;
+}
+
+.diary-fragment__polaroid:hover {
+  transform: rotate(0deg) scale(1.02);
+}
+
+.diary-fragment__polaroid-frame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  max-height: calc(100% - 40px);
+  background: #F5F5F3; /* Kinari 底色 */
+}
+
+/* 模糊弥散背景层 - The Halo Effect */
+.diary-fragment__polaroid-blur-bg {
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(60px);
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.diary-fragment__polaroid-frame img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* 保持原始比例，不裁切 */
+  z-index: 1;
+}
+
+.diary-fragment__polaroid-caption {
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'Caveat', 'Ma Shan Zheng', cursive, sans-serif;
+  font-size: 0.75rem;
+  color: #666;
+  letter-spacing: 0.5px;
+}
+
+/* 更多照片缩略图 */
+.diary-fragment__more-photos {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.diary-fragment__mini-polaroid {
+  width: 48px;
+  height: 56px;
+  background: white;
+  padding: 3px 3px 10px 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: rotate(3deg);
+}
+
+.diary-fragment__mini-polaroid:nth-child(2) {
+  transform: rotate(-4deg);
+}
+
+.diary-fragment__mini-polaroid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 无照片占位 */
+.diary-fragment__no-photo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  padding: 8px 8px 28px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: rotate(-2deg);
+  max-width: 80%;
+  aspect-ratio: 3 / 4;
+}
+
+.diary-fragment__no-photo-icon {
+  font-size: 2.5rem;
+  opacity: 0.3;
+  margin-bottom: var(--spacing-sm);
+}
+
+.diary-fragment__no-photo-text {
+  font-size: 0.75rem;
+  color: #B8B4B0;
+}
+
+/* 右半区 (62%) - 对话与升华 */
+.diary-fragment__right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background-color: #FFFEF8;
+  min-width: 0;
+}
+
+/* A. 头部：标题与时间 */
+.diary-fragment__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.diary-fragment__header-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.diary-fragment__title {
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #383838;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.diary-fragment__header-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.diary-fragment__date,
+.diary-fragment__time {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: #A8A4A0;
+  letter-spacing: 0.5px;
+}
+
+.diary-fragment__time-divider {
+  color: #D0CCC8;
+  font-weight: 200;
+}
+
+/* B. 用户原句 (The Seed) */
+.diary-fragment__seed {
+  position: relative;
+  padding: var(--spacing-sm) var(--spacing-md);
+  padding-left: var(--spacing-xl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.diary-fragment__seed-quote {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: Georgia, 'Noto Serif SC', serif;
+  font-size: 2.5rem;
+  color: #D0CCC8;
+  line-height: 1;
+}
+
+.diary-fragment__seed-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.diary-fragment__seed-text {
+  font-family: 'ZCOOL XiaoWei', 'KaiTi', 'STKaiti', serif;
+  font-size: 1.2rem;
+  color: #555;
+  line-height: 1.8;
+  font-style: italic;
+}
+
+/* C. 分割线 (The Bridge) */
+.diary-fragment__bridge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xs) 0;
+  margin-bottom: var(--spacing-sm);
+}
+
+.diary-fragment__bridge-icon {
+  font-size: 0.9rem;
+  color: #5D7260;
+  opacity: 0.6;
+}
+
+/* D. AI 日记 (The Flower) - 核心阅读区 */
+.diary-fragment__flower {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--spacing-md);
+  background-color: #FAF9F6;
+  border-radius: var(--radius-md);
+  overflow-y: auto;
+}
+
+/* 首字下沉效果 */
+.diary-fragment__prose--dropcap {
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', Georgia, serif;
+  font-size: 0.95rem;
+  color: #383838;
+  line-height: 1.8;
+  margin: 0;
+  text-align: justify;
+  letter-spacing: 0.3px;
+}
+
+.diary-fragment__dropcap {
+  float: left;
+  font-size: 2.8rem;
+  font-weight: 600;
+  color: #5D7260;
+  line-height: 1;
+  margin-right: 8px;
+  margin-top: 4px;
+  font-family: 'Noto Serif SC', Georgia, serif;
+}
+
+.diary-fragment__prose {
+  font-family: 'Noto Serif SC', 'Songti SC', Georgia, serif;
+  font-size: 0.95rem;
+  color: #383838;
+  line-height: 1.8;
+  margin: 0;
+}
+
+
+/* ========================================
+   明信片布局 (Postcard) - 横版照片
+   上下结构：上部照片+语录，下部AI日记
+   ======================================== */
+.diary-fragment--postcard {
+  flex-direction: column;
+}
+
+.diary-fragment__postcard-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: linear-gradient(180deg, #F8F7F4 0%, #FFFEF8 100%);
+}
+
+/* 上部：照片 + 用户语录 */
+.diary-fragment__postcard-top {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  height: 360px;
+  flex-shrink: 0;
+}
+
+/* 横置拍立得明信片 */
+.diary-fragment__landscape-polaroid {
+  position: relative;
+  background: white;
+  padding: 8px 8px 20px 8px; /* 底部白边减小 */
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.06);
+  transform: rotate(-1deg);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px; /* 限制最大宽度 */
+}
+
+.diary-fragment__landscape-polaroid:hover {
+  transform: rotate(0deg);
+}
+
+.diary-fragment__landscape-frame {
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+  background: #F5F5F3; /* Kinari 底色 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diary-fragment__landscape-frame img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover; /* 横版照片使用 cover 填满 */
+  z-index: 1;
+}
+
+/* AI 生成图片标识 - 横版布局 */
+.diary-fragment__ai-indicator {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 5;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.85) 0%, rgba(139, 92, 246, 0.85) 100%);
+  color: #fff;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+/* 印章式角标 */
+.diary-fragment__corner-stamp {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.diary-fragment__corner-stamp--weather {
+  top: -4px;
+  left: -4px;
+  transform: rotate(-10deg);
+  background: linear-gradient(135deg, rgba(224, 242, 254, 0.9) 0%, rgba(186, 230, 253, 0.9) 100%);
+  border: 1.5px dashed rgba(3, 105, 161, 0.35);
+}
+
+.diary-fragment__corner-stamp--mood {
+  bottom: 20px; /* 与底部 padding 对齐 */
+  right: -4px;
+  transform: rotate(8deg);
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.9) 0%, rgba(253, 230, 138, 0.9) 100%);
+  border: 1.5px dashed rgba(146, 64, 14, 0.35);
+}
+
+.diary-fragment__corner-stamp-emoji {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.diary-fragment__corner-stamp-text {
+  font-size: 0.45rem;
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+.diary-fragment__corner-stamp--weather .diary-fragment__corner-stamp-text {
+  color: #0369A1;
+}
+
+.diary-fragment__corner-stamp--mood .diary-fragment__corner-stamp-text {
+  color: #92400E;
+}
+
+/* 底部白边：摄影参数 */
+.diary-fragment__polaroid-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.diary-fragment__meta-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* 心情标识项 - 横版布局底部白边 */
+.diary-fragment__meta-item--mood {
+  flex-direction: row;
+  padding: 0 8px;
+}
+
+.diary-fragment__meta-mood-emoji {
+  font-size: 1.2rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.diary-fragment__meta-label {
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 0.4rem;
+  font-weight: 500;
+  color: #B8B4B0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.diary-fragment__meta-value {
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 0.55rem;
+  color: #666;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* AI 标签 - 位置名称旁的小标签 */
+.diary-fragment__ai-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 4px;
+  font-size: 0.4rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  color: #fff;
+  border-radius: 3px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* 右侧：用户语录 + 缩略图 + 操作 */
+.diary-fragment__postcard-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+
+/* 用户原句 */
+.diary-fragment__postcard-quote {
+  position: relative;
+  padding: var(--spacing-md) var(--spacing-lg);
+  padding-left: calc(var(--spacing-lg) + 12px);
+  background: rgba(255, 254, 248, 0.9);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid rgba(201, 162, 39, 0.6);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.diary-fragment__postcard-quote-mark {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  font-family: Georgia, serif;
+  font-size: 2.2rem;
+  color: #C9A227;
+  opacity: 0.5;
+  line-height: 1;
+}
+
+.diary-fragment__postcard-quote-text {
+  font-family: 'ZCOOL XiaoWei', 'KaiTi', serif;
+  font-size: 1.2rem;
+  color: #444;
+  line-height: 1.8;
+  font-style: italic;
+  margin: 0;
+}
+
+/* 空状态 */
+.diary-fragment__postcard-quote--empty {
+  border-left-color: rgba(168, 164, 160, 0.3);
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-md);
+}
+
+.diary-fragment__postcard-quote-icon {
+  font-size: 2rem;
+  opacity: 0.4;
+  display: block;
+  margin-bottom: var(--spacing-xs);
+}
+
+.diary-fragment__postcard-quote-placeholder {
+  font-family: 'ZCOOL XiaoWei', 'KaiTi', serif;
+  font-size: 1rem;
+  color: #A8A4A0;
+  font-style: italic;
+  margin: 0;
+}
+
+/* 更多照片缩略图 */
+.diary-fragment__postcard-thumbs {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.diary-fragment__postcard-thumb {
+  width: 36px;
+  height: 28px;
+  background: white;
+  padding: 2px 2px 5px 2px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transform: rotate(2deg);
+}
+
+.diary-fragment__postcard-thumb:nth-child(2) {
+  transform: rotate(-2deg);
+}
+
+.diary-fragment__postcard-thumb:nth-child(3) {
+  transform: rotate(3deg);
+}
+
+.diary-fragment__postcard-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 快捷操作 */
+.diary-fragment__postcard-side .diary-fragment__quick-actions {
+  margin-top: auto;
+}
+
+/* 下部：标题 + AI 日记 */
+.diary-fragment__postcard-bottom {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
+  min-height: 0;
+}
+
+.diary-fragment__postcard-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.diary-fragment__postcard-title {
+  font-family: 'Noto Serif SC', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #383838;
+  margin: 0;
+  flex: 1;
+  letter-spacing: 1px;
+}
+
+/* AI 日记 - 横版布局 */
+.diary-fragment__flower--horizontal {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--spacing-sm);
+  background-color: #FAF9F6;
+  border-radius: var(--radius-sm);
+}
+
+.diary-fragment__prose--horizontal {
+  font-family: 'Noto Serif SC', Georgia, serif;
+  font-size: 0.88rem;
+  color: #383838;
+  line-height: 1.75;
+  margin: 0;
+  text-align: justify;
+}
+
+.diary-fragment__prose--horizontal .diary-fragment__dropcap {
+  float: left;
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: #5D7260;
+  line-height: 1;
+  margin-right: 6px;
+  margin-top: 2px;
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+@media (max-width: 768px) {
+  .diary-fragment__postcard-top {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .diary-fragment__postcard-side {
+    width: 100%;
+  }
+
+  .diary-fragment__spread {
+    flex-direction: column;
+  }
+
+  .diary-fragment__left-panel {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    max-height: 200px;
+    padding: var(--spacing-md);
+  }
+
+  .diary-fragment__polaroid-area {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--spacing-md);
+  }
+
+  .diary-fragment__polaroid {
+    max-width: 120px;
+  }
+
+  .diary-fragment__right-panel {
+    padding: var(--spacing-md);
+  }
+
+  .diary-fragment__title {
+    font-size: 1.2rem;
+  }
+
+  .diary-fragment__dropcap {
+    font-size: 2.2rem;
+  }
+
+  .diary-fragment__corner-stamp {
+    width: 38px;
+    height: 38px;
+  }
+
+  .diary-fragment__corner-stamp-emoji {
+    font-size: 0.9rem;
+  }
+
+  .diary-fragment__corner-stamp-text {
+    font-size: 0.4rem;
+  }
+}
+
+
+/* ========================================
+   AI 图像生成相关样式
+   ======================================== */
+
+/* AI生成按钮 */
+.diary-fragment__ai-generate-btn {
+  margin-top: var(--spacing-sm);
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #5D7260 0%, #7A9A7E 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(93, 114, 96, 0.3);
+}
+
+.diary-fragment__ai-generate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(93, 114, 96, 0.4);
+}
+
+.diary-fragment__ai-generate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* AI生成中的加载动画 */
+.diary-fragment__no-photo-icon--loading {
+  animation: ai-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ai-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+/* AI生成进度条 */
+.diary-fragment__ai-progress {
+  width: 80%;
+  max-width: 120px;
+  height: 3px;
+  background: rgba(93, 114, 96, 0.2);
+  border-radius: var(--radius-full);
+  margin-top: var(--spacing-sm);
+  overflow: hidden;
+}
+
+.diary-fragment__ai-progress-bar {
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, #5D7260, #7A9A7E);
+  border-radius: var(--radius-full);
+  animation: ai-progress 2s ease-in-out infinite;
+}
+
+@keyframes ai-progress {
+  0% {
+    width: 0%;
+    margin-left: 0%;
+  }
+  50% {
+    width: 60%;
+    margin-left: 20%;
+  }
+  100% {
+    width: 0%;
+    margin-left: 100%;
+  }
+}
+
+/* AI生成的图像标记 */
+.diary-fragment__polaroid--ai .diary-fragment__polaroid-frame {
+  position: relative;
+}
+
+.diary-fragment__polaroid--ai .diary-fragment__polaroid-frame::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(93, 114, 96, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* AI 生成图片填满容器 */
+.diary-fragment__polaroid--ai .diary-fragment__polaroid-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 横版 AI 图片的拍立得样式 */
+.diary-fragment__landscape-polaroid .diary-fragment__landscape-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.diary-fragment__ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px;
+  background: linear-gradient(135deg, #5D7260 0%, #7A9A7E 100%);
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  margin-right: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* 无照片区域优化 */
+.diary-fragment__no-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  padding: var(--spacing-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: rotate(-2deg);
+  max-width: 80%;
+  aspect-ratio: 3 / 4;
+  text-align: center;
+}
+
+
+/* ========================================
+   翻页动画 (Page Flip Animation)
+   ======================================== */
+
+/* 翻页动画 - 淡入滑动效果 */
+.diary-fragment--flip-next {
+  animation: pageSlideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes pageSlideIn {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* 翻页动画 - 向后翻 */
+.diary-fragment--flip-prev {
+  animation: pageSlideInReverse 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes pageSlideInReverse {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 0 100%);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+
+/* ========================================
+   多图切换按钮样式
+   ======================================== */
+
+/* 切换按钮基础样式 */
+.diary-fragment__photo-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.85);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: #5D7260;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.25s ease;
+  z-index: 5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.diary-fragment__polaroid:hover .diary-fragment__photo-nav,
+.diary-fragment__landscape-polaroid:hover .diary-fragment__photo-nav {
+  opacity: 1;
+}
+
+.diary-fragment__photo-nav:hover {
+  background-color: #5D7260;
+  color: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.diary-fragment__photo-nav--prev {
+  left: 4px;
+}
+
+.diary-fragment__photo-nav--next {
+  right: 4px;
+}
+
+/* 横版布局的切换按钮位置调整 */
+.diary-fragment__photo-nav--landscape {
+  top: 45%;
+}
+
+.diary-fragment__photo-nav--landscape.diary-fragment__photo-nav--prev {
+  left: 12px;
+}
+
+.diary-fragment__photo-nav--landscape.diary-fragment__photo-nav--next {
+  right: 12px;
+}
+
+/* 照片指示器 */
+.diary-fragment__photo-indicator {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 5;
+}
+
+.diary-fragment__polaroid:hover .diary-fragment__photo-indicator,
+.diary-fragment__landscape-polaroid:hover .diary-fragment__photo-indicator {
+  opacity: 1;
+}
+
+/* 横版布局的指示器位置 */
+.diary-fragment__photo-indicator--landscape {
+  bottom: 28px;
+}

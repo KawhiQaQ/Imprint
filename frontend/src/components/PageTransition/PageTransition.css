@@ -1,0 +1,93 @@
+/* ========================================
+   PageTransition - 苔原静谧 (Moss & Mist)
+   墨染过渡效果
+   ======================================== */
+
+.page-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.page-transition__layer {
+  position: absolute;
+  inset: 0;
+  transform: translateY(100%);
+}
+
+/* 墨染效果 - 三层渐变 */
+.page-transition--ink .page-transition__layer--1 {
+  background: linear-gradient(
+    180deg,
+    rgba(93, 114, 96, 0.95) 0%,
+    rgba(93, 114, 96, 0.98) 50%,
+    rgba(93, 114, 96, 1) 100%
+  );
+}
+
+.page-transition--ink .page-transition__layer--2 {
+  background: linear-gradient(
+    180deg,
+    rgba(140, 158, 137, 0.9) 0%,
+    rgba(93, 114, 96, 0.95) 100%
+  );
+}
+
+.page-transition--ink .page-transition__layer--3 {
+  background: linear-gradient(
+    180deg,
+    rgba(237, 242, 238, 0.85) 0%,
+    rgba(140, 158, 137, 0.9) 100%
+  );
+}
+
+/* 进入动画 */
+.page-transition--enter .page-transition__layer--1 {
+  animation: inkWash 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.page-transition--enter .page-transition__layer--2 {
+  animation: inkWash 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.08s forwards;
+}
+
+.page-transition--enter .page-transition__layer--3 {
+  animation: inkWash 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.16s forwards;
+}
+
+/* 激活状态 - 保持覆盖 */
+.page-transition--active .page-transition__layer {
+  transform: translateY(0);
+}
+
+/* 退出动画 */
+.page-transition--exit .page-transition__layer--1 {
+  animation: inkFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.16s forwards;
+}
+
+.page-transition--exit .page-transition__layer--2 {
+  animation: inkFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.08s forwards;
+}
+
+.page-transition--exit .page-transition__layer--3 {
+  animation: inkFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes inkWash {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes inkFade {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
