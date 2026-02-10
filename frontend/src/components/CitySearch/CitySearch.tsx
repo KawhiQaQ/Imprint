@@ -157,7 +157,15 @@ const CitySearch: React.FC<CitySearchProps> = ({
         {isSearching ? (
           <span className="city-search__spinner" />
         ) : (
-          <span className="city-search__icon">⌕</span>
+          <button 
+            type="button"
+            className="city-search__search-btn"
+            onClick={() => searchCities(query)}
+            disabled={disabled || isLoading || !query.trim()}
+            aria-label="搜索"
+          >
+            ⌕
+          </button>
         )}
       </div>
 

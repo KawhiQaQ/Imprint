@@ -307,12 +307,16 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .home-input-panel--active {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+  pointer-events: auto;
+  z-index: 2;
 }
 
 .home-search-hint {
