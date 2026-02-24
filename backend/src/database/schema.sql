@@ -50,6 +50,9 @@ CREATE TABLE IF NOT EXISTS travel_nodes (
     node_status TEXT DEFAULT 'normal' CHECK(node_status IN ('normal', 'changed', 'unrealized', 'changed_original')),
     status_reason TEXT,
     parent_node_id TEXT REFERENCES travel_nodes(id),
+    -- 位置信息
+    location TEXT,
+    distance_to_next REAL,
     -- 扩展信息
     price_info TEXT,
     ticket_info TEXT,

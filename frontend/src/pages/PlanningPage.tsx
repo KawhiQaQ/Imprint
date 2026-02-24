@@ -137,6 +137,13 @@ const PlanningPage: React.FC = () => {
     }
   }, [itinerary]);
 
+  // 如果生成完成但行程仍为空（生成失败），也关闭初始 loading
+  useEffect(() => {
+    if (!isGenerating && !isLoading && hasTriedGenerate.current && initialLoading) {
+      setInitialLoading(false);
+    }
+  }, [isGenerating, isLoading, initialLoading]);
+
   // Error state (only show if not loading)
   if (error && !itinerary && !showFullScreenLoading) {
     return (

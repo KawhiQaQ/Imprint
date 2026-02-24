@@ -88,6 +88,9 @@ export interface TravelNode {
   activity?: string; // 活动描述：如"游玩西湖景区"、"品尝杭帮菜"
   isStartingPoint?: boolean; // 是否是大型景区的起点位置（如鼓浪屿的某个码头/旅馆）
   scenicAreaName?: string; // 如果是起点，对应的景区名称（如"鼓浪屿"）
+  // 位置信息
+  location?: string; // 经纬度坐标，格式 "经度,纬度"
+  distanceToNext?: number; // 到下一个节点的距离（公里）
   // 扩展信息
   priceInfo?: string; // 价格信息：餐厅人均、酒店房价、景点门票价格
   ticketInfo?: string; // 门票/预约信息：如"需提前预约"、"免费"、"门票80元"

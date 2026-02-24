@@ -49,7 +49,8 @@ const HistoryPage: React.FC = () => {
       try {
         const memoirResponse = await memoirApi.get(trip.id);
         // 后端返回格式: { success: true, memoir: { coverImageUrl: '...' } }
-        const memoir = memoirResponse.data?.memoir;
+        const data = memoirResponse.data as unknown as { success: boolean; memoir: { coverImageUrl?: string } };
+        const memoir = data?.memoir;
         if (memoir?.coverImageUrl) {
           return { tripId: trip.id, coverUrl: memoir.coverImageUrl };
         }

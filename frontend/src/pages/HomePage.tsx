@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { VisionInput, CitySearch, LoadingOverlay } from '../components';
 import { useTrip } from '../hooks';
@@ -7,16 +7,23 @@ import './HomePage.css';
 
 type InputMode = 'vision' | 'search';
 
+// 定义 CitySearch 组件的 ref 类型
+interface CitySearchRef {
+  setQueryAndSearch: (query: string) => void;
+}
+
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { analyzeVision, directSelectCity, recommendDestinations, isLoading, error } = useTrip();
   const [inputMode, setInputMode] = useState<InputMode>('vision');
   const [selectedCity, setSelectedCity] = useState<CitySearchResult | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const citySearchRef = useRef<CitySearchRef>(null);
   
   // 加载状态
   const [showLoading, setShowLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
+  const [directSelectError, setDirectSelectError] = useState<string | null>(null);
   
   // 日期选择状态
   const [startDate, setStartDate] = useState<string>(() => {
@@ -62,6 +69,7 @@ const HomePage: React.FC = () => {
   const handleCitySelect = useCallback((city: CitySearchResult) => {
     setSelectedCity(city);
     setShowDatePicker(true);
+    setDirectSelectError(null);
   }, []);
 
   const handleDirectSelect = useCallback(async () => {
@@ -80,16 +88,21 @@ const HomePage: React.FC = () => {
       });
       
       if (result && result.trip) {
+        // 先跳转到 PlanningPage，让那边的 LoadingOverlay 接管加载状态
+        // 这样即使行程生成还在进行中，用户也不会卡在首页
+        navigate(`/planning/${result.trip.id}`);
+        // 短暂延迟后关闭首页的 loading（PlanningPage 有自己的 loading）
         setTimeout(() => {
           setShowLoading(false);
-          navigate(`/planning/${result.trip.id}`);
-        }, 1000);
+        }, 300);
       } else {
         setShowLoading(false);
+        setDirectSelectError('规划失败，请稍后重试');
       }
     } catch (err) {
       console.error('Direct select error:', err);
       setShowLoading(false);
+      setDirectSelectError('网络错误，请检查网络连接后重试');
     }
   }, [selectedCity, directSelectCity, startDate, totalDays, arrivalTime, departureTime, navigate]);
 
@@ -164,6 +177,7 @@ const HomePage: React.FC = () => {
           <div className={`home-input-panel ${inputMode === 'search' ? 'home-input-panel--active' : ''}`}>
             <p className="home-search-hint">输入城市名称，开启你的旅程</p>
             <CitySearch
+              ref={citySearchRef}
               onCitySelect={handleCitySelect}
               isLoading={isLoading}
               disabled={isLoading}
@@ -176,11 +190,7 @@ const HomePage: React.FC = () => {
                     key={city}
                     className="home-search-suggestion"
                     onClick={() => {
-                      const input = document.querySelector('.city-search__input') as HTMLInputElement;
-                      if (input) {
-                        input.value = city;
-                        input.dispatchEvent(new Event('input', { bubbles: true }));
-                      }
+                      citySearchRef.current?.setQueryAndSearch(city);
                     }}
                   >
                     {city}
@@ -270,6 +280,14 @@ const HomePage: React.FC = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 错误提示 */}
+      {directSelectError && (
+        <div className="home-error-toast" onClick={() => setDirectSelectError(null)}>
+          <span className="home-error-toast-text">{directSelectError}</span>
+          <span className="home-error-toast-close">✕</span>
         </div>
       )}
 

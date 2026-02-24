@@ -33,8 +33,8 @@ export class DeepSeekClient extends BaseClient {
     const baseUrl = config?.baseUrl || process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';
     const apiKey = config?.apiKey || process.env.DEEPSEEK_API_KEY || '';
 
-    // DeepSeek 生成复杂内容需要较长时间，设置 300 秒超时（5分钟）
-    super({ baseUrl, apiKey, timeout: config?.timeout || 300000 });
+    // DeepSeek 生成复杂内容需要较长时间，设置 600 秒超时（10分钟）
+    super({ baseUrl, apiKey, timeout: config?.timeout || 600000 });
 
     this.model = config?.model || process.env.DEEPSEEK_MODEL || 'deepseek-chat';
 

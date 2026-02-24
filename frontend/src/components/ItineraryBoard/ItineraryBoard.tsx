@@ -24,15 +24,6 @@ const NODE_TYPE_CONFIG: Record<string, { icon: string; label: string; color: str
   hotel: { icon: '🏨', label: '住宿', color: '#9B8AA6' },
 };
 
-// 交通方式图标
-const TRANSPORT_MODE_CONFIG: Record<string, { icon: string; label: string }> = {
-  walk: { icon: '🚶', label: '步行' },
-  bus: { icon: '🚌', label: '公交' },
-  subway: { icon: '🚇', label: '地铁' },
-  taxi: { icon: '🚕', label: '打车' },
-  drive: { icon: '🚗', label: '自驾' },
-};
-
 const ItineraryBoard: React.FC<ItineraryBoardProps> = ({
   itinerary,
   onNodeUpdate,
@@ -42,8 +33,8 @@ const ItineraryBoard: React.FC<ItineraryBoardProps> = ({
 }) => {
   const [editingNode, setEditingNode] = useState<EditingNode | null>(null);
   const [activeDay, setActiveDay] = useState<number>(1);
-  // 展开状态管理
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  // 折叠状态管理 —— 默认全部展开，记录被用户手动折叠的节点
+  const [collapsedNodes, setCollapsedNodes] = useState<Set<string>>(new Set());
 
   // Group nodes by day
   const nodesByDay = useMemo(() => {
@@ -92,16 +83,16 @@ const ItineraryBoard: React.FC<ItineraryBoardProps> = ({
     return mins > 0 ? `${hours}h${mins}m` : `${hours}小时`;
   };
 
-  // 切换卡片展开状态
+  // 切换卡片展开/折叠状态
   const toggleExpand = useCallback((nodeId: string, e: React.MouseEvent) => {
     // 阻止事件冒泡，避免触发编辑
     e.stopPropagation();
-    setExpandedNodes(prev => {
+    setCollapsedNodes(prev => {
       const next = new Set(prev);
       if (next.has(nodeId)) {
-        next.delete(nodeId);
+        next.delete(nodeId); // 展开
       } else {
-        next.add(nodeId);
+        next.add(nodeId); // 折叠
       }
       return next;
     });
@@ -191,31 +182,11 @@ const ItineraryBoard: React.FC<ItineraryBoardProps> = ({
           <div className="itinerary-board__stones">
             {currentDayNodes.map((node, nodeIndex) => {
               const config = getNodeConfig(node.type);
-              const transportConfig = node.transportMode ? TRANSPORT_MODE_CONFIG[node.transportMode] : null;
-              const isExpanded = expandedNodes.has(node.id);
+              const isExpanded = !collapsedNodes.has(node.id);
               const keyTags = getKeyTags(node);
               
               return (
                 <React.Fragment key={node.id}>
-                  {/* 交通过渡连接器 */}
-                  {nodeIndex > 0 && (
-                    <div className="itinerary-board__connector">
-                      <div className="itinerary-board__connector-line"></div>
-                      {node.transportMode && (
-                        <div className="itinerary-board__connector-transport">
-                          <span className="itinerary-board__connector-icon">
-                            {transportConfig?.icon || '🚶'}
-                          </span>
-                          <span className="itinerary-board__connector-text">
-                            {transportConfig?.label}
-                            {node.transportDuration && ` ${node.transportDuration}分钟`}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* 踏脚石节点 */}
                   <div className="itinerary-board__stone">
                     {/* 左列：时间锚点 */}
                     <div className="itinerary-board__stone-time">
@@ -240,147 +211,175 @@ const ItineraryBoard: React.FC<ItineraryBoardProps> = ({
                     </div>
 
                     {/* 右列：事件卡片 */}
-                    <div 
-                      className={`itinerary-board__stone-card ${isExpanded ? 'itinerary-board__stone-card--expanded' : ''}`}
-                      style={{ borderLeftColor: config.color }}
-                      onClick={(e) => toggleExpand(node.id, e)}
-                    >
-                      {/* 收纳状态：核心信息 */}
-                      <div className="itinerary-board__stone-summary">
-                        <div className="itinerary-board__stone-main">
-                          <span className="itinerary-board__stone-icon">{config.icon}</span>
-                          <span className="itinerary-board__stone-name-text">
-                            {node.isStartingPoint && node.scenicAreaName 
-                              ? node.scenicAreaName 
-                              : (node.activity || node.name)}
-                          </span>
-                          {keyTags.length > 0 && (
-                            <span className="itinerary-board__stone-key-tag">
-                              {keyTags[0]}
-                            </span>
-                          )}
-                        </div>
-                        <span className={`itinerary-board__stone-expand-icon ${isExpanded ? 'itinerary-board__stone-expand-icon--expanded' : ''}`}>
-                          ▼
+                  <div 
+                    className={`itinerary-board__stone-card ${isExpanded ? 'itinerary-board__stone-card--expanded' : ''}`}
+                    style={{ borderLeftColor: config.color }}
+                    onClick={(e) => toggleExpand(node.id, e)}
+                  >
+                    {/* 收纳状态：核心信息 */}
+                    <div className="itinerary-board__stone-summary">
+                      <div className="itinerary-board__stone-main">
+                        <span className="itinerary-board__stone-icon">{config.icon}</span>
+                        <span className="itinerary-board__stone-name-text">
+                          {node.isStartingPoint && node.scenicAreaName 
+                            ? node.scenicAreaName 
+                            : (node.activity || node.name)}
                         </span>
+                        {keyTags.length > 0 && (
+                          <span className="itinerary-board__stone-key-tag">
+                            {keyTags[0]}
+                          </span>
+                        )}
+                      </div>
+                      <span className={`itinerary-board__stone-expand-icon ${isExpanded ? 'itinerary-board__stone-expand-icon--expanded' : ''}`}>
+                        ▼
+                      </span>
+                    </div>
+
+                    {/* 展开状态：详细信息 */}
+                    <div className={`itinerary-board__stone-details ${isExpanded ? 'itinerary-board__stone-details--visible' : ''}`}>
+                      {/* 类型标签 */}
+                      <div className="itinerary-board__stone-header">
+                        <span className="itinerary-board__stone-type" style={{ color: config.color }}>
+                          {config.label}
+                        </span>
+                        {node.verified && (
+                          <span className="itinerary-board__stone-verified">✓ 已验证</span>
+                        )}
                       </div>
 
-                      {/* 展开状态：详细信息 */}
-                      <div className={`itinerary-board__stone-details ${isExpanded ? 'itinerary-board__stone-details--visible' : ''}`}>
-                        {/* 类型标签 */}
-                        <div className="itinerary-board__stone-header">
-                          <span className="itinerary-board__stone-type" style={{ color: config.color }}>
-                            {config.label}
+                      {/* 地点名称 - 可编辑 */}
+                      {editingNode?.id === node.id && editingNode.field === 'name' ? (
+                        <input
+                          type="text"
+                          className="itinerary-board__edit-input"
+                          value={editingNode.value}
+                          onChange={(e) => handleEditChange(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                          onBlur={handleEditSave}
+                          onClick={(e) => e.stopPropagation()}
+                          autoFocus
+                        />
+                      ) : (
+                        <h4
+                          className="itinerary-board__stone-name"
+                          onClick={(e) => handleEditStart(node, 'name', e)}
+                        >
+                          {node.name}
+                          {node.isStartingPoint && (
+                            <span className="itinerary-board__stone-starting">（起点）</span>
+                          )}
+                        </h4>
+                      )}
+
+                      {/* 价格和门票标签 */}
+                      <div className="itinerary-board__stone-tags">
+                        {node.priceInfo && node.priceInfo !== '不适用' && (
+                          <span className="itinerary-board__stone-tag itinerary-board__stone-tag--price">
+                            💰 {node.priceInfo}
                           </span>
-                          {node.verified && (
-                            <span className="itinerary-board__stone-verified">✓ 已验证</span>
-                          )}
-                        </div>
-
-                        {/* 地点名称 - 可编辑 */}
-                        {editingNode?.id === node.id && editingNode.field === 'name' ? (
-                          <input
-                            type="text"
-                            className="itinerary-board__edit-input"
-                            value={editingNode.value}
-                            onChange={(e) => handleEditChange(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            onBlur={handleEditSave}
-                            onClick={(e) => e.stopPropagation()}
-                            autoFocus
-                          />
-                        ) : (
-                          <h4
-                            className="itinerary-board__stone-name"
-                            onClick={(e) => handleEditStart(node, 'name', e)}
-                          >
-                            {node.name}
-                            {node.isStartingPoint && (
-                              <span className="itinerary-board__stone-starting">（起点）</span>
-                            )}
-                          </h4>
                         )}
-
-                        {/* 价格和门票标签 */}
-                        <div className="itinerary-board__stone-tags">
-                          {node.priceInfo && node.priceInfo !== '不适用' && (
-                            <span className="itinerary-board__stone-tag itinerary-board__stone-tag--price">
-                              💰 {node.priceInfo}
-                            </span>
-                          )}
-                          {node.ticketInfo && node.ticketInfo !== '不适用' && (
-                            <span className="itinerary-board__stone-tag itinerary-board__stone-tag--ticket">
-                              🎫 {node.ticketInfo}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* AI 推荐语 */}
-                        {editingNode?.id === node.id && editingNode.field === 'description' ? (
-                          <textarea
-                            className="itinerary-board__edit-textarea"
-                            value={editingNode.value}
-                            onChange={(e) => handleEditChange(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            onBlur={handleEditSave}
-                            onClick={(e) => e.stopPropagation()}
-                            autoFocus
-                            rows={2}
-                          />
-                        ) : (
-                          node.description && (
-                            <p
-                              className="itinerary-board__stone-desc"
-                              onClick={(e) => handleEditStart(node, 'description', e)}
-                            >
-                              {node.description}
-                            </p>
-                          )
+                        {node.ticketInfo && node.ticketInfo !== '不适用' && (
+                          <span className="itinerary-board__stone-tag itinerary-board__stone-tag--ticket">
+                            🎫 {node.ticketInfo}
+                          </span>
                         )}
+                      </div>
 
-                        {/* 小贴士 */}
-                        {node.tips && (
-                          <div className="itinerary-board__stone-tips">
-                            💡 {node.tips}
-                          </div>
-                        )}
+                      {/* AI 推荐语 */}
+                      {editingNode?.id === node.id && editingNode.field === 'description' ? (
+                        <textarea
+                          className="itinerary-board__edit-textarea"
+                          value={editingNode.value}
+                          onChange={(e) => handleEditChange(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                          onBlur={handleEditSave}
+                          onClick={(e) => e.stopPropagation()}
+                          autoFocus
+                          rows={2}
+                        />
+                      ) : (
+                        node.description && (
+                          <p
+                            className="itinerary-board__stone-desc"
+                            onClick={(e) => handleEditStart(node, 'description', e)}
+                          >
+                            {node.description}
+                          </p>
+                        )
+                      )}
 
-                        {/* 操作按钮 */}
-                        <div className="itinerary-board__stone-actions">
-                          <button 
-                            className="itinerary-board__stone-action"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // 构建搜索关键词：地点名 + 城市，确保搜索准确
-                              const city = itinerary?.destination || '';
-                              const keyword = node.address 
-                                ? `${city}${node.address}` 
-                                : `${city}${node.name}`;
-                              // 使用高德地图搜索，添加城市参数
-                              const url = `https://uri.amap.com/search?keyword=${encodeURIComponent(keyword)}&city=${encodeURIComponent(city)}`;
-                              window.open(url, '_blank');
-                            }}
-                          >
-                            📍 地图导航
-                          </button>
-                          <button 
-                            className="itinerary-board__stone-action"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // 构建搜索关键词，在百度/小红书搜索详情
-                              const city = itinerary?.destination || '';
-                              const searchQuery = `${city} ${node.name} 攻略`;
-                              // 使用百度搜索查看详情
-                              const url = `https://www.baidu.com/s?wd=${encodeURIComponent(searchQuery)}`;
-                              window.open(url, '_blank');
-                            }}
-                          >
-                            🔗 查看详情
-                          </button>
+                      {/* 小贴士 */}
+                      {node.tips && (
+                        <div className="itinerary-board__stone-tips">
+                          💡 {node.tips}
                         </div>
+                      )}
+
+                      {/* 操作按钮 */}
+                      <div className="itinerary-board__stone-actions">
+                        <button 
+                          className="itinerary-board__stone-action"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const city = itinerary?.destination || '';
+                            const keyword = node.address 
+                              ? `${city}${node.address}` 
+                              : `${city}${node.name}`;
+                            const url = `https://uri.amap.com/search?keyword=${encodeURIComponent(keyword)}&city=${encodeURIComponent(city)}`;
+                            window.open(url, '_blank');
+                          }}
+                        >
+                          📍 地图导航
+                        </button>
+                        <button 
+                          className="itinerary-board__stone-action"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const city = itinerary?.destination || '';
+                            const searchQuery = `${city} ${node.name} 攻略`;
+                            const url = `https://www.baidu.com/s?wd=${encodeURIComponent(searchQuery)}`;
+                            window.open(url, '_blank');
+                          }}
+                        >
+                          🔗 查看详情
+                        </button>
                       </div>
                     </div>
                   </div>
+                  </div>
+
+                  {/* 连接线 - 纵向时间轴串联 */}
+                  {nodeIndex < currentDayNodes.length - 1 && (() => {
+                    const nextNode = currentDayNodes[nodeIndex + 1];
+                    const nextConfig = getNodeConfig(nextNode.type);
+                    return (
+                      <div className="itinerary-board__connector">
+                        <div className="itinerary-board__connector-time"></div>
+                        <div className="itinerary-board__connector-line">
+                          <div
+                            className="itinerary-board__connector-stem"
+                            style={{
+                              background: `linear-gradient(to bottom, ${config.color}, ${nextConfig.color})`
+                            }}
+                          ></div>
+                          <div
+                            className="itinerary-board__connector-midpoint"
+                            style={{
+                              background: `linear-gradient(135deg, ${config.color}, ${nextConfig.color})`
+                            }}
+                          ></div>
+                          <div
+                            className="itinerary-board__connector-stem"
+                            style={{
+                              background: `linear-gradient(to bottom, ${config.color}, ${nextConfig.color})`
+                            }}
+                          ></div>
+                        </div>
+                        <div className="itinerary-board__connector-spacer"></div>
+                      </div>
+                    );
+                  })()}
                 </React.Fragment>
               );
             })}

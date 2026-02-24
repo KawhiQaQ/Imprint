@@ -135,6 +135,17 @@ function runMigrations(database: Database.Database): void {
     database.exec('ALTER TABLE travel_nodes ADD COLUMN parent_node_id TEXT');
   }
 
+  // 添加位置和距离字段
+  if (!columnNames.includes('location')) {
+    console.log('Adding location column to travel_nodes table...');
+    database.exec('ALTER TABLE travel_nodes ADD COLUMN location TEXT');
+  }
+
+  if (!columnNames.includes('distance_to_next')) {
+    console.log('Adding distance_to_next column to travel_nodes table...');
+    database.exec('ALTER TABLE travel_nodes ADD COLUMN distance_to_next REAL');
+  }
+
   // 检查 travel_memoirs 表是否有 opening_text 和 closing_text 字段
   const memoirsTableInfo = database.prepare("PRAGMA table_info(travel_memoirs)").all() as Array<{ name: string }>;
   const memoirsColumnNames = memoirsTableInfo.map(col => col.name);

@@ -4,3 +4,6 @@ export * from './destinationService';
 export * from './itineraryService';
 export * from './diaryService';
 export * from './memoirService';
+export * from './clusterService';
+export * from './routeOptimizer';
+export * from './itineraryPipeline';

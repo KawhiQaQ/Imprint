@@ -47,6 +47,9 @@ export interface TravelNode {
   activity?: string; // 活动描述：如"游玩西湖景区"、"品尝杭帮菜"
   isStartingPoint?: boolean; // 是否是大型景区的起点位置
   scenicAreaName?: string; // 如果是起点，对应的景区名称
+  // 位置信息
+  location?: string; // 经纬度坐标，格式 "经度,纬度"
+  distanceToNext?: number; // 到下一个节点的距离（公里）
   // 扩展信息
   priceInfo?: string; // 价格信息：餐厅人均、酒店房价、景点门票价格
   ticketInfo?: string; // 门票/预约信息：如"需提前预约"、"免费"、"门票80元"
@@ -135,6 +138,8 @@ interface TravelNodeRow {
   activity: string | null;
   is_starting_point: number | null;
   scenic_area_name: string | null;
+  location: string | null;
+  distance_to_next: number | null;
   price_info: string | null;
   ticket_info: string | null;
   tips: string | null;
@@ -392,10 +397,11 @@ export class StorageService {
           id, itinerary_id, name, type, address, description,
           estimated_duration, scheduled_time, day_index, node_order,
           verified, verification_info, is_lit, time_slot, activity,
-          is_starting_point, scenic_area_name, price_info, ticket_info, tips,
+          is_starting_point, scenic_area_name, location, distance_to_next,
+          price_info, ticket_info, tips,
           transport_mode, transport_duration, transport_note,
           node_status, status_reason, parent_node_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       for (const node of itinerary.nodes) {
@@ -417,6 +423,8 @@ export class StorageService {
           node.activity || null,
           node.isStartingPoint ? 1 : 0,
           node.scenicAreaName || null,
+          node.location || null,
+          node.distanceToNext || null,
           node.priceInfo || null,
           node.ticketInfo || null,
           node.tips || null,
@@ -452,7 +460,8 @@ export class StorageService {
       SELECT id, itinerary_id, name, type, address, description,
              estimated_duration, scheduled_time, day_index, node_order,
              verified, verification_info, is_lit, time_slot, activity,
-             is_starting_point, scenic_area_name, price_info, ticket_info, tips,
+             is_starting_point, scenic_area_name, location, distance_to_next,
+             price_info, ticket_info, tips,
              transport_mode, transport_duration, transport_note,
              node_status, status_reason, parent_node_id
       FROM travel_nodes WHERE itinerary_id = ?
@@ -493,6 +502,8 @@ export class StorageService {
       activity: row.activity || undefined,
       isStartingPoint: row.is_starting_point === 1,
       scenicAreaName: row.scenic_area_name || undefined,
+      location: row.location || undefined,
+      distanceToNext: row.distance_to_next || undefined,
       priceInfo: row.price_info || undefined,
       ticketInfo: row.ticket_info || undefined,
       tips: row.tips || undefined,

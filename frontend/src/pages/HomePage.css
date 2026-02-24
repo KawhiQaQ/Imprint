@@ -660,3 +660,45 @@
     padding: var(--spacing-xl);
   }
 }
+
+/* ========================================
+   错误提示 Toast
+   ======================================== */
+
+.home-error-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-error, #e74c3c);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: home-toast-in 0.3s ease;
+}
+
+.home-error-toast-text {
+  font-size: 0.9rem;
+}
+
+.home-error-toast-close {
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+
+@keyframes home-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

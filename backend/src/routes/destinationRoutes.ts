@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { destinationService, CitySearchResult } from '../services/destinationService';
 import { storageService, SearchConditions } from '../services/storageService';
+import { itineraryService } from '../services/itineraryService';
 
 const router = Router();
 
@@ -238,15 +239,12 @@ router.post('/direct-select', async (req: Request, res: Response) => {
       return;
     }
 
-    // Get city details
-    const cityDetails = await destinationService.getCityDetails(cityName);
-
-    if (!cityDetails) {
-      res.status(400).json({
-        success: false,
-        error: '无法获取城市信息，请确认城市名称正确',
-      });
-      return;
+    // Get city details (optional, don't block if it fails)
+    let cityDetails = null;
+    try {
+      cityDetails = await destinationService.getCityDetails(cityName);
+    } catch (err) {
+      console.warn('Failed to get city details, continuing without it:', err);
     }
 
     // Create a trip with direct selection
@@ -281,19 +279,30 @@ router.post('/direct-select', async (req: Request, res: Response) => {
       return;
     }
 
-    // Create initial empty itinerary
-    const itinerary = {
-      id: uuidv4(),
-      tripId: updatedTrip.id,
-      destination: cityName,
-      totalDays: totalDays || 3,
-      startDate,
-      nodes: [],
-      userPreferences: [],
-      lastUpdated: new Date(),
-    };
-
-    await storageService.saveItinerary(itinerary);
+    // Generate itinerary with AI (may take time, but don't block completely on failure)
+    let itinerary;
+    try {
+      itinerary = await itineraryService.generateItinerary(
+        updatedTrip.id,
+        cityName,
+        conditions,
+        totalDays || 3
+      );
+    } catch (err) {
+      console.error('Failed to generate itinerary:', err);
+      // Create empty itinerary so user can still proceed
+      itinerary = {
+        id: uuidv4(),
+        tripId: updatedTrip.id,
+        destination: cityName,
+        totalDays: totalDays || 3,
+        startDate,
+        nodes: [],
+        userPreferences: [],
+        lastUpdated: new Date(),
+      };
+      await storageService.saveItinerary(itinerary);
+    }
 
     res.json({
       success: true,

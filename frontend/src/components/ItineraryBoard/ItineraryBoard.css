@@ -85,46 +85,8 @@
 }
 
 /* ========================================
-   连接器
+   连接器 - 已移除，交通信息现在在左侧列显示
    ======================================== */
-.itinerary-board__connector {
-  display: flex;
-  align-items: center;
-  padding: var(--spacing-xs) 0;
-  margin-left: calc(15% + 20px);
-}
-
-.itinerary-board__connector-line {
-  width: 1px;
-  height: 20px;
-  background: repeating-linear-gradient(
-    to bottom,
-    #ddd 0px,
-    #ddd 3px,
-    transparent 3px,
-    transparent 6px
-  );
-  margin-right: var(--spacing-md);
-}
-
-.itinerary-board__connector-transport {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.6875rem;
-  color: var(--color-text-muted);
-  background-color: rgba(0, 0, 0, 0.03);
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-}
-
-.itinerary-board__connector-icon {
-  font-size: 0.875rem;
-}
-
-.itinerary-board__connector-text {
-  font-weight: 500;
-}
 
 /* ========================================
    踏脚石节点 (Stone)
@@ -132,18 +94,24 @@
 .itinerary-board__stone {
   display: flex;
   align-items: flex-start;
-  gap: var(--spacing-md);
-  padding: var(--spacing-xs) 0;
+  gap: 0;
+  min-height: 60px;
 }
 
-/* 左列：时间锚点 */
+/* 最左列：交通信息 - 已移除，改为线条旁的侧边注释 */
+.itinerary-board__stone-transport {
+  display: none;
+}
+
+/* 中左列：时间锚点 */
 .itinerary-board__stone-time {
-  width: 15%;
+  width: 60px;
   min-width: 60px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   padding-top: var(--spacing-sm);
+  padding-right: var(--spacing-sm);
   flex-shrink: 0;
 }
 
@@ -163,13 +131,13 @@
 
 /* 中列：时间线 */
 .itinerary-board__stone-timeline {
-  width: 5%;
-  min-width: 32px;
+  width: 48px;
+  min-width: 48px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: var(--spacing-sm);
   flex-shrink: 0;
+  padding-top: var(--spacing-sm);
 }
 
 .itinerary-board__stone-dot {
@@ -182,6 +150,7 @@
   background-color: #5D7260;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: transform var(--transition-fast);
+  z-index: 2;
 }
 
 .itinerary-board__stone:hover .itinerary-board__stone-dot {
@@ -191,6 +160,70 @@
 .itinerary-board__stone-dot-icon {
   font-size: 0.875rem;
   filter: grayscale(0.2);
+}
+
+/* 时间线连接线容器 */
+.itinerary-board__stone-line-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+}
+
+/* 时间线连接线 - 连续的竖线 */
+.itinerary-board__stone-line {
+  width: 2px;
+  height: 32px;
+  background-color: #ddd;
+  flex-shrink: 0;
+}
+
+/* 连接器行 - 纵向时间轴串联 */
+.itinerary-board__connector {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+}
+
+.itinerary-board__connector-time {
+  width: 60px;
+  min-width: 60px;
+  flex-shrink: 0;
+  padding-right: var(--spacing-sm);
+}
+
+.itinerary-board__connector-line {
+  width: 48px;
+  min-width: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 2px 0;
+}
+
+/* 渐变实线 - 上下两段 */
+.itinerary-board__connector-stem {
+  width: 2.5px;
+  flex: 1;
+  min-height: 14px;
+  border-radius: 1px;
+  opacity: 0.5;
+}
+
+/* 中间小圆点 - 串联标记 */
+.itinerary-board__connector-midpoint {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  opacity: 0.45;
+}
+
+/* 右侧留白占位 - 不再显示横线 */
+.itinerary-board__connector-spacer {
+  flex: 1;
 }
 
 /* ========================================
@@ -203,10 +236,10 @@
   padding: var(--spacing-sm) var(--spacing-md);
   border-left: 3px solid #5D7260;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-  position: relative;
   cursor: pointer;
   transition: all var(--transition-fast);
   user-select: none;
+  margin-left: var(--spacing-sm);
 }
 
 .itinerary-board__stone-card:hover {
@@ -508,8 +541,18 @@
    ======================================== */
 @media (max-width: 1200px) {
   .itinerary-board__stone-time {
-    width: 12%;
-    min-width: 50px;
+    width: 55px;
+    min-width: 55px;
+  }
+  
+  .itinerary-board__connector-time {
+    width: 55px;
+    min-width: 55px;
+  }
+  
+  .itinerary-board__connector-line {
+    width: 48px;
+    min-width: 48px;
   }
   
   .itinerary-board__stone-time-main {
@@ -526,12 +569,19 @@
     padding: var(--spacing-md);
   }
   
-  .itinerary-board__stone {
-    gap: var(--spacing-sm);
+  .itinerary-board__stone-time {
+    width: 50px;
+    min-width: 50px;
   }
   
-  .itinerary-board__stone-time {
-    width: 15%;
+  .itinerary-board__connector-time {
+    width: 50px;
+    min-width: 50px;
+  }
+  
+  .itinerary-board__connector-line {
+    width: 48px;
+    min-width: 48px;
   }
   
   .itinerary-board__stone-time-main {
@@ -553,9 +603,23 @@
     display: none;
   }
   
+  .itinerary-board__connector-time {
+    display: none;
+  }
+  
+  .itinerary-board__connector-line {
+    width: 36px;
+    min-width: 36px;
+  }
+  
   .itinerary-board__stone-timeline {
-    width: auto;
-    min-width: 24px;
+    width: 36px;
+    min-width: 36px;
+  }
+  
+  .itinerary-board__connector-line {
+    width: 36px;
+    min-width: 36px;
   }
   
   .itinerary-board__stone-dot {
@@ -565,10 +629,6 @@
   
   .itinerary-board__stone-dot-icon {
     font-size: 0.75rem;
-  }
-  
-  .itinerary-board__connector {
-    margin-left: 32px;
   }
   
   .itinerary-board__stone-name-text {
@@ -582,5 +642,9 @@
   .itinerary-board__stone-action {
     width: 100%;
     text-align: center;
+  }
+  
+  .itinerary-board__line-transport-text {
+    font-size: 0.75rem;
   }
 }
